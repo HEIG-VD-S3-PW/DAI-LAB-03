@@ -34,4 +34,8 @@ public class Video {
     public void setURL(String URL){
         this.URL = URL;
     }
+
+    public String toString(){
+        return title + ": " + description;
+    }
 }
