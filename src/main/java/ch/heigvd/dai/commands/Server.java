@@ -18,6 +18,7 @@ public class Server implements Callable<Integer> {
 
     @Override
     public Integer call() {
+        StreamingVideo server = initServer();
         throw new UnsupportedOperationException(
                 "Please remove this exception and implement this method.");
     }
