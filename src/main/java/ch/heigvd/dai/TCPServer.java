@@ -1,7 +1,8 @@
 package ch.heigvd.dai;
 
-// https://medium.com/@gaurangjotwani/creating-a-tcp-connection-between-two-servers-in-java-27fabe53deaa
+// https://www.geeksforgeeks.org/multithreaded-servers-in-java/
 
+import ch.heigvd.dai.commands.Client;
 import ch.heigvd.dai.commands.Server;
 
 import java.net.*;
@@ -13,80 +14,150 @@ import java.util.*;
 public class TCPServer {
     private int port;
     private ServerSocket serverSocket;
-    private StreamingVideo streamingVideo;
+    private static StreamingVideo streamingVideo;
 
     public TCPServer(int port) throws IOException {
         this.port = port;
-        serverSocket = new ServerSocket(port);
-        streamingVideo = new StreamingVideo();
         initServer();
+        try {
+            // server is listening on port 1234
+            serverSocket = new ServerSocket(port);
+            serverSocket.setReuseAddress(true);
 
-        System.out.println("Server is running and waiting for client connection...");
+            // running infinite loop for getting
+            // client request
+            while (true) {
 
-        // Accept incoming client connection
-        Socket clientSocket = serverSocket.accept();
-        System.out.println("Client connected!");
+                // socket object to receive incoming client
+                // requests
+                Socket client = serverSocket.accept();
 
-        // Setup input and output streams for communication with the client
-        BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-        PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+                // Displaying that new client is connected
+                // to server
+                System.out.println("New client connected "
+                        + client.getInetAddress()
+                        .getHostAddress());
 
-        out.println("Welcome to the Amar Streaming Platform !");
+                // create a new thread object
+                ClientHandler clientSock
+                        = new ClientHandler(client);
 
-        /* ---------------- Manage authentification ---------------- */
+                // This thread will handle the client
+                // separately
+                new Thread(clientSock).start();
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        finally {
+            if (serverSocket != null) {
+                try {
+                    serverSocket.close();
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 
-        // Read message from client, contains its pseudo
-        String pseudo = in.readLine();
+    // ClientHandler class
+    private static class ClientHandler implements Runnable {
+        private final Socket clientSocket;
 
-        while(pseudo.isEmpty()) {
-            out.println("Invalid entry.");
+        // Constructor
+        public ClientHandler(Socket socket)
+        {
+            this.clientSocket = socket;
         }
 
-        out.println("Valid pseudo");
+        public void run()
+        {
+            PrintWriter out = null;
+            BufferedReader in = null;
+            try {
 
-        System.out.println("Client pseudo is : " + pseudo);
+                // get the outputstream of client
+                out = new PrintWriter(
+                        clientSocket.getOutputStream(), true);
 
-        String email = in.readLine();
+                // get the inputstream of client
+                in = new BufferedReader(
+                        new InputStreamReader(
+                                clientSocket.getInputStream()));
 
-        while(!emailValidation(email)){
-            out.println("Invalid entry.");
-            email = in.readLine();
+                out.println("Welcome to the Amar Streaming Platform !");
+
+                // Read message from client, contains its pseudo
+                String pseudo = in.readLine();
+
+                while(pseudo.isEmpty()) {
+                    out.println("Invalid entry.");
+                }
+
+                out.println("Valid pseudo");
+
+                System.out.println("Client pseudo is : " + pseudo);
+
+                String email = in.readLine();
+
+                while(!emailValidation(email)){
+                    out.println("Invalid entry.");
+                    email = in.readLine();
+                }
+
+                out.println("Valid email");
+
+                System.out.println("Client email is : " + email);
+
+                streamingVideo.addUser(new User(pseudo, email));
+
+
+                /* ---------------- Manage Video choice ---------------- */
+                String videos = "";
+                int index = 1;
+
+                for(Video v : streamingVideo.getVideos()){
+                    videos += index++ + ". " + v.toString() + "\n";
+                }
+
+                out.println("\nPlease choose between one of the following videos:\n" + videos);
+                out.println("end");
+
+                String videoChoice = in.readLine();
+                while(!checkValidity(videoChoice)){
+                    out.println("Invalid entry.");
+                    videoChoice = in.readLine();
+                }
+
+                out.println("Valid choice");
+
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
+            finally {
+                try {
+                    if (out != null) {
+                        out.close();
+                    }
+                    if (in != null) {
+                        in.close();
+                        clientSocket.close();
+                    }
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
-
-        out.println("Valid email");
-
-        System.out.println("Client email is : " + email);
-
-        streamingVideo.addUser(new User(pseudo, email));
-
-
-        /* ---------------- Manage Video choice ---------------- */
-        String videos = "";
-        int index = 1;
-
-        for(Video v : streamingVideo.getVideos()){
-            videos += index++ + ". " + v.toString() + "\n";
-        }
-
-        out.println("Please choose between one of the following videos:\n" + videos);
-        out.println("end");
-
-        String videoChoice = in.readLine();
-        while(!checkValidity(videoChoice)){
-            out.println("Invalid entry.");
-            videoChoice = in.readLine();
-        }
-
-        out.println("Valid choice");
-
-        // Close the client socket
-        clientSocket.close();
-        // Close the server socket
-        serverSocket.close();
     }
 
     private void initServer(){
         String videoPath = System.getProperty("user.dir") + "/videos";
+
+        streamingVideo = new StreamingVideo();
 
         streamingVideo.addVideo(new Video("3 Minute Timer", "Displays a timer from 3 minutes to 0", videoPath + "video1.mp4"));
         streamingVideo.addVideo(new Video("Google Office tour", "Visit of Google's building", videoPath + "video2.mp4"));
@@ -95,7 +166,7 @@ public class TCPServer {
         streamingVideo.addVideo(new Video("Why is Switzerland home to so many billionaires", "Documentary on Switzerland's billionaires", videoPath + "video5.mp4"));
     }
 
-    private boolean emailValidation(String email){
+    private static boolean emailValidation(String email){
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\."+
                 "[a-zA-Z0-9_+&*-]+)*@" +
                 "(?:[a-zA-Z0-9-]+\\.)+[a-z" +
@@ -106,7 +177,7 @@ public class TCPServer {
         return pat.matcher(email).matches();
     }
 
-    private boolean checkValidity(String videoChoice){
+    private static boolean checkValidity(String videoChoice){
         int index = 0;
         try{
             index = Integer.parseInt(videoChoice);
