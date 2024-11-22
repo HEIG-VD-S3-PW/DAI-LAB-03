@@ -7,6 +7,7 @@ import ch.heigvd.dai.commands.Server;
 
 import java.net.*;
 import java.io.*;
+import java.nio.Buffer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.*;
@@ -74,18 +75,12 @@ public class TCPServer {
 
         public void run()
         {
-            PrintWriter out = null;
-            BufferedReader in = null;
-            try {
 
-                // get the outputstream of client
-                out = new PrintWriter(
-                        clientSocket.getOutputStream(), true);
-
-                // get the inputstream of client
-                in = new BufferedReader(
-                        new InputStreamReader(
-                                clientSocket.getInputStream()));
+            try (PrintWriter out = new PrintWriter(
+                    clientSocket.getOutputStream(), true);
+                 BufferedReader in = new BufferedReader(
+                         new InputStreamReader(
+                                 clientSocket.getInputStream()));){
 
                 out.println("Welcome to the Amar Streaming Platform !");
 
@@ -137,23 +132,12 @@ public class TCPServer {
             catch (IOException e) {
                 e.printStackTrace();
             }
-            finally {
-                try {
-                    if (out != null) {
-                        out.close();
-                    }
-                    if (in != null) {
-                        in.close();
-                        clientSocket.close();
-                    }
-                }
-                catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
 
+    /**
+     * Initialize the streamingVideo and add the available videos to watch
+     */
     private void initServer(){
         String videoPath = System.getProperty("user.dir") + "/videos";
 
@@ -166,6 +150,11 @@ public class TCPServer {
         streamingVideo.addVideo(new Video("Why is Switzerland home to so many billionaires", "Documentary on Switzerland's billionaires", videoPath + "video5.mp4"));
     }
 
+    /**
+     * Check if the entered email is valid
+     * @param email : Email entered by the user
+     * @return true if valid and false otherwise
+     */
     private static boolean emailValidation(String email){
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\."+
                 "[a-zA-Z0-9_+&*-]+)*@" +
@@ -177,6 +166,11 @@ public class TCPServer {
         return pat.matcher(email).matches();
     }
 
+    /**
+     * Check if the video choice is valid
+     * @param videoChoice: index of the chosen video
+     * @return true if the index is valid and false otherwise
+     */
     private static boolean checkValidity(String videoChoice){
         int index = 0;
         try{
