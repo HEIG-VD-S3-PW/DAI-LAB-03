@@ -3,7 +3,7 @@ package ch.heigvd.dai.commands;
 import java.io.IOException;
 import java.util.concurrent.Callable;
 
-import ch.heigvd.dai.TCPClient;
+import ch.heigvd.dai.client.TCPClient;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "client", description = "Start the client part.")
