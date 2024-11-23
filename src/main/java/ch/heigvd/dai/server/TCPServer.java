@@ -78,11 +78,12 @@ public class TCPServer {
         public void run()
         {
 
-            try (PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+            try (BufferedWriter out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
                  BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))
             ){
 
-                out.println("Welcome to the Amar Streaming Platform !");
+                out.write("Welcome to the Amar Streaming Platform !" + "\n");
+                out.flush();
 
                 SignInServerProcess signInServerProcess = new SignInServerProcess(in, out, streamingVideo);
                 signInServerProcess.execute();

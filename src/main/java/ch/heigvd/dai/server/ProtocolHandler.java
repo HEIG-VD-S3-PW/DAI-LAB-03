@@ -7,16 +7,18 @@ import ch.heigvd.dai.protocol.CommandRegistry;
 import ch.heigvd.dai.protocol.CommandResponse;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
 
 public class ProtocolHandler {
     private final CommandRegistry registry;
     private final BufferedReader in;
-    private final PrintWriter out;
+    private final BufferedWriter out;
     private final User user;
     private final StreamingVideo streamingVideo;
 
-    public ProtocolHandler(CommandRegistry registry, BufferedReader in, PrintWriter out, User user, StreamingVideo streamingVideo) {
+    public ProtocolHandler(CommandRegistry registry, BufferedReader in, BufferedWriter out, User user, StreamingVideo streamingVideo) {
         this.registry = registry;
         this.in = in;
         this.out = out;
@@ -24,7 +26,7 @@ public class ProtocolHandler {
         this.streamingVideo = streamingVideo;
     }
 
-    public void handleLine(String line) {
+    public void handleLine(String line) throws IOException {
         String[] parts = line.split(" ", 2);
         String commandName = parts[0].toUpperCase();
         String[] args = parts.length > 1 ? parts[1].split(" ") : new String[0];
@@ -50,8 +52,8 @@ public class ProtocolHandler {
         }
     }
 
-    private void sendResponse(CommandResponse response) {
-        out.println(response.getCode() + " " + response.getMessage());
+    private void sendResponse(CommandResponse response) throws IOException {
+        out.write(response.getCode() + " " + response.getMessage());
         out.flush();
     }
 }

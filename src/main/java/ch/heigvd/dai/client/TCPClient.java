@@ -18,8 +18,8 @@ public class TCPClient {
         try (Socket socket = new Socket(host, port)) {
 
             // writing to server
-            PrintWriter out = new PrintWriter(
-                    socket.getOutputStream(), true);
+            BufferedWriter out = new BufferedWriter(
+                    new OutputStreamWriter(socket.getOutputStream()));
 
             // reading from server
             BufferedReader in
@@ -60,7 +60,7 @@ public class TCPClient {
                 }
 
                 // Envoi au serveur
-                out.println(input);
+                out.write(input + "\n");
                 out.flush();
 
                 // Affichage de la réponse

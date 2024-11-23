@@ -3,6 +3,7 @@ package ch.heigvd.dai.protocol;
 import ch.heigvd.dai.protocol.commands.WatchCommand;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,11 +11,11 @@ import java.util.Map;
 public class CommandRegistry {
 
     private final BufferedReader in;
-    private final PrintWriter out;
+    private final BufferedWriter out;
 
     private final Map<String, Command> commands = new HashMap<>();
 
-    public CommandRegistry(BufferedReader in, PrintWriter out) {
+    public CommandRegistry(BufferedReader in, BufferedWriter out) {
         this.in = in;
         this.out = out;
 

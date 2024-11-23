@@ -4,6 +4,7 @@ import ch.heigvd.dai.User;
 import ch.heigvd.dai.server.StreamingVideo;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.PrintWriter;
 import java.util.regex.Pattern;
 
@@ -12,7 +13,7 @@ public class SignInServerProcess extends Process {
     private StreamingVideo streamingVideo;
     private User user;
 
-    public SignInServerProcess(BufferedReader in, PrintWriter out, StreamingVideo streamingVideo) {
+    public SignInServerProcess(BufferedReader in, BufferedWriter out, StreamingVideo streamingVideo) {
         super(in, out);
         this.streamingVideo = streamingVideo;
     }
@@ -24,23 +25,28 @@ public class SignInServerProcess extends Process {
         String pseudo = in.readLine();
 
         while(pseudo.isEmpty()) {
-            out.println("Invalid entry.");
+            out.write("Invalid entry." + "\n");
+            out.flush();
         }
 
-        out.println("Valid pseudo");
+        out.write("Valid pseudo" + "\n");
+        out.flush();
 
         System.out.println("Client pseudo is : " + pseudo);
 
         String email = in.readLine();
 
         while(!emailValidation(email)){
-            out.println("Invalid entry.");
+            out.write("Invalid entry." + "\n");
+            out.flush();
             email = in.readLine();
         }
 
-        out.println("Valid email");
+        out.write("Valid email" + "\n");
+        out.flush();
 
         System.out.println("Client email is : " + email);
+
 
         User user = new User(pseudo, email);
 
