@@ -2,19 +2,20 @@ package ch.heigvd.dai.protocol;
 
 public class CommandResponse {
 
+    private final int code;
     private final String message;
-    private final boolean success;
 
-    public CommandResponse(String message, boolean success) {
+    public CommandResponse(int code, String message) {
+        this.code = code;
         this.message = message;
-        this.success = success;
+    }
+
+    public int getCode() {
+        return code;
     }
 
     public String getMessage() {
         return message;
     }
 
-    public boolean isSuccess() {
-        return success;
-    }
 }

@@ -1,5 +1,7 @@
 package ch.heigvd.dai.protocol;
 
+import ch.heigvd.dai.User;
+
 public abstract class Command {
 
     protected final String name;
@@ -12,7 +14,7 @@ public abstract class Command {
 
     public abstract void validate(String[] args) throws CommandException;
 
-    public abstract CommandResponse execute(String[] args);
+    public abstract CommandResponse execute(User user, String[] args);
 
 
 }

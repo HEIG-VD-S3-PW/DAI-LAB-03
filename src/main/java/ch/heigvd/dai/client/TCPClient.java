@@ -2,11 +2,16 @@ package ch.heigvd.dai.client;
 
 // https://www.geeksforgeeks.org/multithreaded-servers-in-java/
 
+import ch.heigvd.dai.protocol.Command;
+import ch.heigvd.dai.protocol.CommandRegistry;
+
 import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
 
 public class TCPClient {
+
+    private static final CommandRegistry registry = new CommandRegistry();
 
     public TCPClient(String host, int port) throws IOException {
         // establish a connection by providing host and port
@@ -44,19 +49,45 @@ public class TCPClient {
                 response = in.readLine();
             }while(response.equals("Invalid entry."));
 
-            // Get all videos
-            while(true) {
-                response = in.readLine();
-                if(response.equals("end")) break;
-                System.out.println(response);
-            }
 
+            /*
             do{
                 System.out.print("Enter your choice: ");
                 String videoChoice = scanner.nextLine();
                 out.println(videoChoice);
                 response = in.readLine();
             }while(response.equals("Invalid entry."));
+*/
+            while(true){
+                System.out.print("> ");
+                Scanner sc = new Scanner(System.in);
+                String input = sc.nextLine().trim();
+
+                if (input.equalsIgnoreCase("quit")) {
+                    break;
+                }
+
+                String[] parts = input.split(" ", 2);
+                String commandName = parts[0].toUpperCase();
+
+                Command command = registry.getCommand(commandName);
+                if (command == null) {
+                    System.out.println("✗ Commande inconnue: " + commandName);
+                    continue;
+                }
+
+                // Envoi au serveur
+                out.println(input);
+                out.flush();
+
+                // Affichage de la réponse
+                try {
+                    String resp = in.readLine();
+                    System.out.println(resp);
+                } catch (IOException e) {
+                    System.out.println("✗ Erreur de communication: " + e.getMessage());
+                }
+            }
 
             // Close the socket
             socket.close();

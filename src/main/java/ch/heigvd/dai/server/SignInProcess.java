@@ -19,7 +19,7 @@ public class SignInProcess {
         this.streamingVideo = streamingVideo;
     }
 
-    public boolean start() throws IOException {
+    public User start() throws IOException {
 
 
         // Read message from client, contains its pseudo
@@ -44,9 +44,11 @@ public class SignInProcess {
 
         System.out.println("Client email is : " + email);
 
-        streamingVideo.addUser(new User(pseudo, email));
+        User user = new User(pseudo, email);
 
-        return true;
+        streamingVideo.addUser(user);
+
+        return user;
 
     }
 

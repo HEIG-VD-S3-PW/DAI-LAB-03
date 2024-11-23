@@ -4,6 +4,7 @@ package ch.heigvd.dai.server;
 
 import ch.heigvd.dai.User;
 import ch.heigvd.dai.Video;
+import ch.heigvd.dai.protocol.CommandRegistry;
 
 import java.net.*;
 import java.io.*;
@@ -81,18 +82,27 @@ public class TCPServer {
                 out.println("Welcome to the Amar Streaming Platform !");
 
                 SignInProcess signInProcess = new SignInProcess(in, out, streamingVideo);
-                if(!signInProcess.start()){
+                User user = null;
+                if((user = signInProcess.start()) == null){
                     out.println("An error occurred during the sign in process.");
                     return;
                 }
 
+                CommandRegistry registry = new CommandRegistry();
+                ProtocolHandler protocolHandler = new ProtocolHandler(registry, in, out, user);
+
                 while(!clientSocket.isClosed()){
 
+                    String line = in.readLine();
+                    System.out.println("RECEIVED: " + line);
+                    protocolHandler.handleLine(line);
 
                 }
 
 
+
                 /* ---------------- Manage Video choice ---------------- */
+                /*
                 String videos = "";
                 int index = 1;
 
@@ -110,6 +120,8 @@ public class TCPServer {
                 }
 
                 out.println("Valid choice");
+
+                 */
 
             }
             catch (IOException e) {
