@@ -4,6 +4,7 @@ package ch.heigvd.dai.server;
 
 import ch.heigvd.dai.User;
 import ch.heigvd.dai.Video;
+import ch.heigvd.dai.process.SignInServerProcess;
 import ch.heigvd.dai.protocol.CommandRegistry;
 
 import java.net.*;
@@ -81,12 +82,14 @@ public class TCPServer {
 
                 out.println("Welcome to the Amar Streaming Platform !");
 
-                SignInProcess signInProcess = new SignInProcess(in, out, streamingVideo);
-                User user = null;
-                if((user = signInProcess.start()) == null){
-                    out.println("An error occurred during the sign in process.");
+                SignInServerProcess signInServerProcess = new SignInServerProcess(in, out, streamingVideo);
+                signInServerProcess.execute();
+
+                if(signInServerProcess.getUser() == null){
                     return;
                 }
+
+                User user = signInServerProcess.getUser();
 
                 CommandRegistry registry = new CommandRegistry();
                 ProtocolHandler protocolHandler = new ProtocolHandler(registry, in, out, user);
@@ -126,6 +129,8 @@ public class TCPServer {
             }
             catch (IOException e) {
                 e.printStackTrace();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
         }
     }

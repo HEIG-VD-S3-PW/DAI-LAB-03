@@ -2,6 +2,7 @@ package ch.heigvd.dai.client;
 
 // https://www.geeksforgeeks.org/multithreaded-servers-in-java/
 
+import ch.heigvd.dai.process.SignInClientProcess;
 import ch.heigvd.dai.protocol.Command;
 import ch.heigvd.dai.protocol.CommandRegistry;
 
@@ -27,27 +28,9 @@ public class TCPClient {
                     = new BufferedReader(new InputStreamReader(
                     socket.getInputStream()));
 
-            // Receive response from the server
-            String response = in.readLine();
-            System.out.println(response);
 
-            Scanner scanner = new Scanner(System.in);
-
-            do{
-                System.out.print("Enter your pseudo: ");
-                String pseudo = scanner.nextLine();
-                out.println(pseudo);
-                response = in.readLine();
-            }while(response.equals("Invalid entry."));
-
-
-            // Prompt the user to enter their email
-            do{
-                System.out.print("Enter your email: ");
-                String email = scanner.nextLine();
-                out.println(email);
-                response = in.readLine();
-            }while(response.equals("Invalid entry."));
+            SignInClientProcess signInClientProcess = new SignInClientProcess(in, out);
+            signInClientProcess.execute();
 
 
             /*
@@ -94,6 +77,8 @@ public class TCPClient {
         }
         catch (IOException e) {
             e.printStackTrace();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }

@@ -1,26 +1,24 @@
-package ch.heigvd.dai.server;
+package ch.heigvd.dai.process;
 
 import ch.heigvd.dai.User;
+import ch.heigvd.dai.server.StreamingVideo;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.regex.Pattern;
 
-public class SignInProcess {
+public class SignInServerProcess extends Process {
 
-    private BufferedReader in;
-    private PrintWriter out;
     private StreamingVideo streamingVideo;
+    private User user;
 
-    public SignInProcess(BufferedReader in, PrintWriter out, StreamingVideo streamingVideo) {
-        this.in = in;
-        this.out = out;
+    public SignInServerProcess(BufferedReader in, PrintWriter out, StreamingVideo streamingVideo) {
+        super(in, out);
         this.streamingVideo = streamingVideo;
     }
 
-    public User start() throws IOException {
-
+    @Override
+    public void execute() throws Exception {
 
         // Read message from client, contains its pseudo
         String pseudo = in.readLine();
@@ -48,8 +46,12 @@ public class SignInProcess {
 
         streamingVideo.addUser(user);
 
-        return user;
+        this.user = user;
 
+    }
+
+    public User getUser() {
+        return user;
     }
 
     /**
@@ -67,5 +69,7 @@ public class SignInProcess {
             return false;
         return pat.matcher(email).matches();
     }
+
+
 
 }
