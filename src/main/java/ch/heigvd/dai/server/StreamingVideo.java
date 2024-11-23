@@ -15,11 +15,6 @@ public class StreamingVideo {
         videos = new ArrayList<>();
     }
 
-    public StreamingVideo(List<User> users, List<Video> videos) {
-        this.users = users;
-        this.videos = videos;
-    }
-
     public void load(){
 
         String videoPath = System.getProperty("user.dir") + "/videos";

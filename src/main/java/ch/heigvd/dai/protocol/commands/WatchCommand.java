@@ -29,9 +29,8 @@ public class WatchCommand extends Command {
         }
 
         Video video = streamingVideo.getVideo(videoChoice);
-        out.println("Watching video " + video.getURL());
+        return new CommandResponse(500, "Watching video " + video.getTitle());
 
-        return new CommandResponse(500, "Watching video " + args[0]);
     }
 
 
