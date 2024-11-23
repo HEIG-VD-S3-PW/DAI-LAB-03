@@ -11,7 +11,6 @@ public class CommandRegistry {
 
     public CommandRegistry() {
         registerCommand(new WatchCommand());
-
     }
 
     public void registerCommand(Command command) {

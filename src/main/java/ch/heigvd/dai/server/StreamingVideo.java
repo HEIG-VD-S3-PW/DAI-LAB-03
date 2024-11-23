@@ -1,4 +1,7 @@
-package ch.heigvd.dai;
+package ch.heigvd.dai.server;
+
+import ch.heigvd.dai.User;
+import ch.heigvd.dai.Video;
 
 import java.util.ArrayList;
 import java.util.List;

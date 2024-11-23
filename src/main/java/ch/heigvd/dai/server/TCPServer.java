@@ -2,7 +2,6 @@ package ch.heigvd.dai.server;
 
 // https://www.geeksforgeeks.org/multithreaded-servers-in-java/
 
-import ch.heigvd.dai.StreamingVideo;
 import ch.heigvd.dai.User;
 import ch.heigvd.dai.Video;
 
@@ -74,37 +73,23 @@ public class TCPServer {
         public void run()
         {
 
-            try (PrintWriter out = new PrintWriter(
-                    clientSocket.getOutputStream(), true);
-                 BufferedReader in = new BufferedReader(
-                         new InputStreamReader(
-                                 clientSocket.getInputStream()));){
+            try (PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+                 BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))
+            ){
+
 
                 out.println("Welcome to the Amar Streaming Platform !");
 
-                // Read message from client, contains its pseudo
-                String pseudo = in.readLine();
-
-                while(pseudo.isEmpty()) {
-                    out.println("Invalid entry.");
+                SignInProcess signInProcess = new SignInProcess(in, out, streamingVideo);
+                if(!signInProcess.start()){
+                    out.println("An error occurred during the sign in process.");
+                    return;
                 }
 
-                out.println("Valid pseudo");
+                while(!clientSocket.isClosed()){
 
-                System.out.println("Client pseudo is : " + pseudo);
 
-                String email = in.readLine();
-
-                while(!emailValidation(email)){
-                    out.println("Invalid entry.");
-                    email = in.readLine();
                 }
-
-                out.println("Valid email");
-
-                System.out.println("Client email is : " + email);
-
-                streamingVideo.addUser(new User(pseudo, email));
 
 
                 /* ---------------- Manage Video choice ---------------- */
@@ -148,21 +133,6 @@ public class TCPServer {
         streamingVideo.addVideo(new Video("Why is Switzerland home to so many billionaires", "Documentary on Switzerland's billionaires", videoPath + "video5.mp4"));
     }
 
-    /**
-     * Check if the entered email is valid
-     * @param email : Email entered by the user
-     * @return true if valid and false otherwise
-     */
-    private static boolean emailValidation(String email){
-        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\."+
-                "[a-zA-Z0-9_+&*-]+)*@" +
-                "(?:[a-zA-Z0-9-]+\\.)+[a-z" +
-                "A-Z]{2,7}$";
-        Pattern pat = Pattern.compile(emailRegex);
-        if (email == null)
-            return false;
-        return pat.matcher(email).matches();
-    }
 
     /**
      * Check if the video choice is valid

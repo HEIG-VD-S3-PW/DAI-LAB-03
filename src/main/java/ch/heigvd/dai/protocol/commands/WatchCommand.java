@@ -14,10 +14,14 @@ public class WatchCommand extends Command {
         if (args.length != 1) {
             throw new CommandException("The watch command expects exactly one argument");
         }
+
     }
 
     @Override
     public CommandResponse execute(String[] args) {
+
+
+
         return new CommandResponse("Watching video " + args[0], true);
     }
 }
