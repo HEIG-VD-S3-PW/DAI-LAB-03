@@ -14,12 +14,14 @@ public class ProtocolHandler {
     private final BufferedReader in;
     private final PrintWriter out;
     private final User user;
+    private final StreamingVideo streamingVideo;
 
-    public ProtocolHandler(CommandRegistry registry, BufferedReader in, PrintWriter out, User user) {
+    public ProtocolHandler(CommandRegistry registry, BufferedReader in, PrintWriter out, User user, StreamingVideo streamingVideo) {
         this.registry = registry;
         this.in = in;
         this.out = out;
         this.user = user;
+        this.streamingVideo = streamingVideo;
     }
 
     public void handleLine(String line) {
@@ -38,7 +40,7 @@ public class ProtocolHandler {
             command.validate(args);
 
             // Exécution
-            CommandResponse response = command.execute(user, args);
+            CommandResponse response = command.execute(user, streamingVideo, args);
 
             // Envoi de la réponse
             sendResponse(response);

@@ -12,8 +12,6 @@ import java.util.Scanner;
 
 public class TCPClient {
 
-    private static final CommandRegistry registry = new CommandRegistry();
-
     public TCPClient(String host, int port) throws IOException {
         // establish a connection by providing host and port
         // number
@@ -27,6 +25,8 @@ public class TCPClient {
             BufferedReader in
                     = new BufferedReader(new InputStreamReader(
                     socket.getInputStream()));
+
+            CommandRegistry registry = new CommandRegistry(in, out);
 
 
             SignInClientProcess signInClientProcess = new SignInClientProcess(in, out);
