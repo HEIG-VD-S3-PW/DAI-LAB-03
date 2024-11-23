@@ -1,16 +1,14 @@
-package ch.heigvd.dai;
+package ch.heigvd.dai.server;
 
 // https://www.geeksforgeeks.org/multithreaded-servers-in-java/
 
-import ch.heigvd.dai.commands.Client;
-import ch.heigvd.dai.commands.Server;
+import ch.heigvd.dai.StreamingVideo;
+import ch.heigvd.dai.User;
+import ch.heigvd.dai.Video;
 
 import java.net.*;
 import java.io.*;
-import java.nio.Buffer;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.*;
 
 public class TCPServer {
     private int port;

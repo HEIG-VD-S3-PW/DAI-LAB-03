@@ -1,9 +1,8 @@
-package ch.heigvd.dai;
+package ch.heigvd.dai.client;
 
 // https://www.geeksforgeeks.org/multithreaded-servers-in-java/
 
 import java.io.*;
-import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Scanner;
 

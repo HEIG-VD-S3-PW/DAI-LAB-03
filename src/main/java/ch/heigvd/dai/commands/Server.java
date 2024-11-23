@@ -2,10 +2,7 @@ package ch.heigvd.dai.commands;
 
 import java.util.concurrent.Callable;
 
-import ch.heigvd.dai.StreamingVideo;
-import ch.heigvd.dai.TCPServer;
-import ch.heigvd.dai.Video;
-import ch.heigvd.dai.User;
+import ch.heigvd.dai.server.TCPServer;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "server", description = "Start the server part.")
