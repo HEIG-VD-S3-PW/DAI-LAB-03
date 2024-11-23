@@ -9,6 +9,7 @@ import ch.heigvd.dai.server.StreamingVideo;
 
 import java.io.*;
 
+
 public class WatchCommand extends Command {
     public WatchCommand() {
         super("WATCH", "Watch a video");
@@ -19,12 +20,10 @@ public class WatchCommand extends Command {
         if (args.length != 1) {
             throw new CommandException("The watch command expects exactly one argument");
         }
-
     }
 
     @Override
     public CommandResponse execute(User user, StreamingVideo streamingVideo, String[] args) {
-
         String videoChoice = args[0];
         if(!streamingVideo.checkValidity(videoChoice)){
             return new CommandResponse(404, "Video not found");
@@ -32,29 +31,29 @@ public class WatchCommand extends Command {
 
         Video video = streamingVideo.getVideo(videoChoice);
 
-        try (BufferedReader fileReader = new BufferedReader(new FileReader(video.getURL()), 8192)) {
-
-            char[] buffer = new char[8192];
-            int charsRead;
-
-            while ((charsRead = fileReader.read(buffer)) != -1) {
-                out.write(buffer, 0, charsRead);
-                out.flush();
-
-            }
-
-            // Flush final pour s'assurer que tout est envoyé
+        try {
+            out.write("Video chosen: " + video.getTitle() + "\n");
             out.flush();
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        }catch (IOException e){
+            return new CommandResponse(500, "Error while watching video");
         }
 
 
-        return new CommandResponse(500, "Watching video " + video.getTitle());
-
+        return new CommandResponse(200, "Watching video " + video.getTitle());
     }
 
+    public CommandResponse receive() {
+        File tempFile = null;
+        Process vlcProcess = null;
 
+        try{
+            String response = in.readLine();
+            System.out.println(response);
+        }catch (IOException e){
+            return new CommandResponse(500, "Error while watching video");
+        }
 
+        return new CommandResponse(200, "Video received");
+    }
 }

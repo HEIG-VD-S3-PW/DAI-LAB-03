@@ -13,35 +13,19 @@ import java.util.Scanner;
 public class TCPClient {
 
     public TCPClient(String host, int port) throws IOException {
-        // establish a connection by providing host and port
-        // number
-        try (Socket socket = new Socket(host, port)) {
 
-            // writing to server
-            BufferedWriter out = new BufferedWriter(
-                    new OutputStreamWriter(socket.getOutputStream()));
-
-            // reading from server
-            BufferedReader in
-                    = new BufferedReader(new InputStreamReader(
-                    socket.getInputStream()));
+        try (Socket socket = new Socket(host, port);
+            BufferedWriter out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))
+        ) {
 
             CommandRegistry registry = new CommandRegistry(in, out);
-
 
             SignInClientProcess signInClientProcess = new SignInClientProcess(in, out);
             signInClientProcess.execute();
 
+            while(!socket.isClosed()) {
 
-            /*
-            do{
-                System.out.print("Enter your choice: ");
-                String videoChoice = scanner.nextLine();
-                out.println(videoChoice);
-                response = in.readLine();
-            }while(response.equals("Invalid entry."));
-*/
-            while(true){
                 System.out.print("> ");
                 Scanner sc = new Scanner(System.in);
                 String input = sc.nextLine().trim();
@@ -63,22 +47,14 @@ public class TCPClient {
                 out.write(input + "\n");
                 out.flush();
 
-                // Affichage de la réponse
-                try {
-                    String resp = in.readLine();
-                    System.out.println(resp);
-                } catch (IOException e) {
-                    System.out.println("✗ Erreur de communication: " + e.getMessage());
-                }
+                // Réception de la réponse
+                command.receive();
+
             }
 
-            // Close the socket
-            socket.close();
         }
-        catch (IOException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        catch (Exception e) {
+            System.out.println("Error in the connection: " + e.getMessage());
         }
     }
 }

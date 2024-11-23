@@ -2,14 +2,12 @@ package ch.heigvd.dai.server;
 
 import ch.heigvd.dai.User;
 import ch.heigvd.dai.protocol.Command;
-import ch.heigvd.dai.protocol.CommandException;
 import ch.heigvd.dai.protocol.CommandRegistry;
 import ch.heigvd.dai.protocol.CommandResponse;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 
 public class ProtocolHandler {
     private final CommandRegistry registry;
@@ -53,7 +51,7 @@ public class ProtocolHandler {
     }
 
     private void sendResponse(CommandResponse response) throws IOException {
-        out.write(response.getCode() + " " + response.getMessage());
+        out.write(response.getCode() + " " + response.getMessage() + "\n");
         out.flush();
     }
 }
