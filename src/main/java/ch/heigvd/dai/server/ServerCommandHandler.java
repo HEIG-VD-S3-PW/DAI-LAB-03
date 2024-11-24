@@ -25,6 +25,7 @@ public class ServerCommandHandler {
     }
 
     public void handleLine(String line) throws IOException {
+
         String[] parts = line.split(" ", 2);
         String commandName = parts[0].toUpperCase();
         String[] args = parts.length > 1 ? parts[1].split(" ") : new String[0];

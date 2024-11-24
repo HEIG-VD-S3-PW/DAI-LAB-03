@@ -99,6 +99,11 @@ public class TCPServer {
                 while(!clientSocket.isClosed()){
 
                     String line = in.readLine();
+
+                    if(line == null || line.isEmpty()) {
+                        continue;
+                    }
+
                     System.out.println("RECEIVED: " + line);
                     protocolHandler.handleLine(line);
 

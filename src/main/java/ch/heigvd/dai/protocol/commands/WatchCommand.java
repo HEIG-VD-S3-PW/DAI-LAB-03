@@ -66,7 +66,7 @@ public class WatchCommand extends Command {
     }
 
     @Override
-    public CommandResponse receive() {
+    public void receive() {
         File tempFile = null;
         Process vlcProcess = null;
 
@@ -75,7 +75,7 @@ public class WatchCommand extends Command {
             CommandResponse initialResponse = readResponse();
             if (initialResponse.getCode() != 200) {
                 System.out.println(initialResponse.getMessage());
-                return initialResponse;
+                return;
             }
 
             tempFile = File.createTempFile("video_", ".mp4");
@@ -101,11 +101,8 @@ public class WatchCommand extends Command {
             CommandResponse finalResponse = readResponse();
             System.out.println(finalResponse.getMessage());
 
-            return finalResponse;
-
         } catch (Exception e) {
             System.err.println("Error while watching video: " + e.getMessage());
-            return new CommandResponse(500, "Error while watching video");
 
         } finally {
             if (vlcProcess != null) {

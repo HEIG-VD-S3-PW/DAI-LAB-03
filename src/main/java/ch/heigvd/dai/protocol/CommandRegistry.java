@@ -1,5 +1,6 @@
 package ch.heigvd.dai.protocol;
 
+import ch.heigvd.dai.protocol.commands.ListCommand;
 import ch.heigvd.dai.protocol.commands.WatchCommand;
 
 import java.io.BufferedReader;
@@ -20,6 +21,7 @@ public class CommandRegistry {
         this.out = out;
 
         registerCommand(new WatchCommand());
+        registerCommand(new ListCommand());
     }
 
     public void registerCommand(Command command) {
