@@ -36,14 +36,30 @@ public class WatchCommand extends Command {
         try {
             sendResponse(new CommandResponse(200, "Starting video stream: " + video.getTitle()));
 
-            byte[] videoData = Files.readAllBytes(Path.of(video.getURL()));
-            String encodedVideo = Base64.getEncoder().encodeToString(videoData);
+            try (FileInputStream fis = new FileInputStream(video.getURL())) {
 
-            out.write(encodedVideo + "\n");
-            out.flush();
+                byte[] buffer = new byte[8192]; // Lecture par chunk de 8 Ko
+                int bytesRead;
+
+                while ((bytesRead = fis.read(buffer)) != -1) {
+
+                    // Si on n'a pas lu un buffer complet, on crée un nouveau tableau de la bonne taille
+                    byte[] toEncode = buffer;
+                    if (bytesRead != buffer.length) {
+                        toEncode = new byte[bytesRead];
+                        System.arraycopy(buffer, 0, toEncode, 0, bytesRead);
+                    }
+
+                    String chunk = Base64.getEncoder().encodeToString(toEncode);
+                    out.write(chunk + "\n");
+                    out.flush();
+                }
+
+                out.write("END_OF_DOWNLOAD\n");
+                out.flush();
+            }
 
             return new CommandResponse(200, "Video stream completed");
-
         } catch (IOException e) {
             return new CommandResponse(500, "Error streaming video: " + e.getMessage());
         }
@@ -65,11 +81,16 @@ public class WatchCommand extends Command {
             tempFile = File.createTempFile("video_", ".mp4");
             tempFile.deleteOnExit();
 
-            String encodedVideo = in.readLine();
-            byte[] videoData = Base64.getDecoder().decode(encodedVideo);
 
             try (FileOutputStream fos = new FileOutputStream(tempFile)) {
-                fos.write(videoData);
+                String line;
+                while ((line = in.readLine()) != null) {
+                    if (line.equals("END_OF_DOWNLOAD")) {
+                        break;
+                    }
+                    byte[] chunk = Base64.getDecoder().decode(line);
+                    fos.write(chunk);
+                }
                 fos.flush();
             }
 
@@ -79,21 +100,24 @@ public class WatchCommand extends Command {
 
             CommandResponse finalResponse = readResponse();
             System.out.println(finalResponse.getMessage());
+
             return finalResponse;
 
         } catch (Exception e) {
             System.err.println("Error while watching video: " + e.getMessage());
             return new CommandResponse(500, "Error while watching video");
+
         } finally {
             if (vlcProcess != null) {
                 vlcProcess.destroy();
             }
+
             if (tempFile != null) {
                 try {
                     Files.deleteIfExists(tempFile.toPath());
                     System.out.println("Temporary file deleted");
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    System.err.println("Error while deleting temporary file: " + e.getMessage());
                 }
             }
         }
