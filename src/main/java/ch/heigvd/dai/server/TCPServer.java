@@ -94,7 +94,7 @@ public class TCPServer {
                 User user = signInServerProcess.getUser();
 
                 CommandRegistry registry = new CommandRegistry(in, out);
-                ProtocolHandler protocolHandler = new ProtocolHandler(registry, in, out, user, streamingVideo);
+                ServerCommandHandler protocolHandler = new ServerCommandHandler(registry, in, out, user, streamingVideo);
 
                 while(!clientSocket.isClosed()){
 
@@ -103,30 +103,6 @@ public class TCPServer {
                     protocolHandler.handleLine(line);
 
                 }
-
-
-
-                /* ---------------- Manage Video choice ---------------- */
-                /*
-                String videos = "";
-                int index = 1;
-
-                for(Video v : streamingVideo.getVideos()){
-                    videos += index++ + ". " + v.toString() + "\n";
-                }
-
-                out.println("\nPlease choose between one of the following videos:\n" + videos);
-                out.println("end");
-
-                String videoChoice = in.readLine();
-                while(!checkValidity(videoChoice)){
-                    out.println("Invalid entry.");
-                    videoChoice = in.readLine();
-                }
-
-                out.println("Valid choice");
-
-                 */
 
             }
             catch (IOException e) {
