@@ -49,7 +49,6 @@ public class TCPClient {
 
                 // Réception de la réponse
                 command.receive();
-
             }
 
         }

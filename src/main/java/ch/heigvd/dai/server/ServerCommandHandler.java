@@ -9,14 +9,14 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-public class ProtocolHandler {
+public class ServerCommandHandler {
     private final CommandRegistry registry;
     private final BufferedReader in;
     private final BufferedWriter out;
     private final User user;
     private final StreamingVideo streamingVideo;
 
-    public ProtocolHandler(CommandRegistry registry, BufferedReader in, BufferedWriter out, User user, StreamingVideo streamingVideo) {
+    public ServerCommandHandler(CommandRegistry registry, BufferedReader in, BufferedWriter out, User user, StreamingVideo streamingVideo) {
         this.registry = registry;
         this.in = in;
         this.out = out;
