@@ -46,6 +46,6 @@ public abstract class Command {
 
     public abstract CommandResponse execute(User user, StreamingVideo streamingVideo, String[] args);
 
-    public abstract CommandResponse receive();
+    public abstract void receive();
 
 }

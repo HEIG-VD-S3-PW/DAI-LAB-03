@@ -32,31 +32,29 @@ public class ListCommand extends Command {
     }
 
     @Override
-    public CommandResponse receive() {
+    public void receive() {
         try {
             CommandResponse response = readResponse();
 
-            if (response.getCode() == 200) {
-                String[] videos = response.getMessage().split(";");
-
-                for(String video : videos) {
-                    if(!video.isEmpty()) {
-                        // Split par "," pour avoir index, titre, description
-                        String[] parts = video.split(",");
-                        if(parts.length == 3) {
-                            System.out.println(parts[0] + ") " + parts[1] + " - " + parts[2]);
-                        }
-                    }
-                }
-            } else {
-                System.out.println("Error: " + response.getMessage());
+            if(response.getCode() != 200){
+                System.err.println("Error while listing videos: " + response.getMessage());
+                return;
             }
 
-            return response;
+            String[] videos = response.getMessage().split(";");
+
+            for(String video : videos) {
+                if(!video.isEmpty()) {
+                    // Split par "," pour avoir index, titre, description
+                    String[] parts = video.split(",");
+                    if(parts.length == 3) {
+                        System.out.println(parts[0] + ") " + parts[1] + " - " + parts[2]);
+                    }
+                }
+            }
 
         } catch (IOException e) {
             System.err.println("Error while listing videos: " + e.getMessage());
-            return new CommandResponse(500, "Error while listing videos");
         }
     }
 }
