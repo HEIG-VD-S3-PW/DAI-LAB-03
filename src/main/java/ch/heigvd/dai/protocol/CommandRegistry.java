@@ -1,5 +1,6 @@
 package ch.heigvd.dai.protocol;
 
+import ch.heigvd.dai.protocol.commands.DeleteCommand;
 import ch.heigvd.dai.protocol.commands.ListCommand;
 import ch.heigvd.dai.protocol.commands.WatchCommand;
 
@@ -22,6 +23,7 @@ public class CommandRegistry {
 
         registerCommand(new WatchCommand());
         registerCommand(new ListCommand());
+        registerCommand(new DeleteCommand());
     }
 
     public void registerCommand(Command command) {
