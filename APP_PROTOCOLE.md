@@ -1,7 +1,7 @@
-# DAI-LAB-03
+# Amar Streaming Platform
 
 ## 1. Overview  
-Le protocole DAI-LAB-03 est un protocole permettant de télécharger une vidéo depuis le serveur et de la streamer au
+Le protocole "Amar Streaming Platform" (ASP) est un protocole permettant de télécharger une vidéo depuis le serveur et de la streamer au
 client en utilisant son lecteur de media [VLC](https://www.videolan.org/vlc/index.fr.html).
 
 
