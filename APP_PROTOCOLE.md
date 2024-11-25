@@ -8,7 +8,7 @@
 ## 1. Overview  
 
 The "name of our protocol" is a client-server protocol that enables streaming of 480p videos form the server to the client.
-The server is able to handle **add_max_connection** clients. 
+The server is able to handle 10 clients. 
 Each video can be streamed by multiple clients.
 
 ## 2. Transport protocol 
