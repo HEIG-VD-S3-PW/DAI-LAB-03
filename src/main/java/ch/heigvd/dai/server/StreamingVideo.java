@@ -4,7 +4,9 @@ import ch.heigvd.dai.User;
 import ch.heigvd.dai.Video;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
+import java.io.File;
 
 public class StreamingVideo {
     private List<User> users;
@@ -15,15 +17,44 @@ public class StreamingVideo {
         videos = new ArrayList<>();
     }
 
+    String getFileExtension(String filename) {
+        if (filename == null) {
+            return null;
+        }
+        int dotIndex = filename.lastIndexOf(".");
+        if (dotIndex >= 0) {
+            return filename.substring(dotIndex + 1);
+        }
+        return "";
+    }
+
     public void load(){
 
         String videoPath = System.getProperty("user.dir") + "/videos";
+        File directory = new File(videoPath);
 
-        addVideo(new Video("3 Minute Timer", "Displays a timer from 3 minutes to 0", videoPath + "/video1.mp4"));
-        addVideo(new Video("Google Office tour", "Visit of Google's building", videoPath + "/video2.mp4"));
-        addVideo(new Video("L'entretien - Choss", "Vidéo de Choss sur un entretien", videoPath + "/video3.mp4"));
-        addVideo(new Video("Le Clown - Choss", "Vidéo de Choss sur un clown", videoPath + "/video4.mp4"));
-        addVideo(new Video("Why is Switzerland home to so many billionaires", "Documentary on Switzerland's billionaires", videoPath + "/video5.mp4"));
+        File[] videos = directory.listFiles();
+
+        assert videos != null;
+        for(File video : videos){
+            if(!getFileExtension(video.getName()).equals("mp4")){
+                System.err.println("Invalid format: " + video.getName());
+                return;
+            }
+            String encodedString = video.getName().substring(0, video.getName().lastIndexOf("."));
+            byte[] decodedBytes = Base64.getDecoder().decode(encodedString);
+            String decodedString = new String(decodedBytes);
+
+            String[] videoData = decodedString.split("\\|");
+
+            if(videoData.length != 2){
+                System.err.println("Invalid format: " + video.getName());
+                return;
+            }
+
+            addVideo(new Video (videoData[0], videoData[1], video.getName()));
+            System.out.println(videoData[0] + " " + videoData[1] + " " + video.getName());
+        }
 
     }
 
