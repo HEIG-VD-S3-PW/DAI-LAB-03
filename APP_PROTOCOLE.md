@@ -1,17 +1,12 @@
-> [!IMPORTANT]  
-> Trouver un titre pour le protocole  
-> Retirer cette alerte une fois fait
-
-
-
+# DAI-LAB-03
 
 ## 1. Overview  
+Le protocole DAI-LAB-03 est un protocole permettant de streamer une vidéo depuis le serveur en utilisant le lecteur de 
+media [VLC](https://www.videolan.org/vlc/index.fr.html) du client.
 
-The "name of our protocol" is a client-server protocol that enables streaming of 480p videos form the server to the client.
-The server is able to handle 10 clients. 
-Each video can be streamed by multiple clients.
 
 ## 2. Transport protocol 
+
 
 
 
