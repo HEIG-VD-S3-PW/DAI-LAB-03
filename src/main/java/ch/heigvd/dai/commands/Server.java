@@ -17,7 +17,7 @@ public class Server implements Callable<Integer> {
     @Override
     public Integer call() {
         try{
-            TCPServer server = new TCPServer(port);
+            TCPServer.main(new String[]{"-p", String.valueOf(port)});
         }
         catch(Exception e){
             System.err.println("Couldn't create a TCP connexion on the server side :" + e.getMessage());
