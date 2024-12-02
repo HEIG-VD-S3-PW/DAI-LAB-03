@@ -6,22 +6,30 @@ de la streamer au client en utilisant son lecteur de media [VLC](https://www.vid
 
 
 ## 2. Transport protocol 
-ASP utilise le protocole TCP pour la connexion, les messages et l'envoie de la vidéo.
-Par défaut, le port à utiliser est 1986.
-L'échange de message et l'envoie de la vidéo se fait en texte. 
-C'est le clients qui initie la connection. Il se charge aussi de fermer la connexion.
-Les erreurs sont gérées par le serveur. Lorsqu'une erreur apparaît, le serveur notifie le client concerné. 
+Le protocle ASP permet le visionnage (WATCH), le listage (LIST) et la suppression (DELETE) d'une/des vidéos présentent 
+sur le serveur.  
+ASP utilise le protocole TCP pour ces échanges. Par défaut, le port à utiliser est 1986.  
 
+C'est le clients qui initie la connection automatiquement. Si il parvient à se connecter au serveur, celui-ci lui 
+demande son nom et une adresse email. Un contrôle est effectué par le serveur sur ces entrées. Si celle-ci ne sont pas 
+valables, le serveur demande l'information à nouveau. Une fois les informations validées, le serveur attend de recevoir 
+les commandes de l'utilisateur.
 
+Un contrôle de validité est effectué pour chaque message envoyé au serveur.  
+L'utilisateur peut demander la liste des vidéos (LIST). Le serveur lui retourne alors la liste des vidéos qui sont 
+disponibles.   
+L'utilisateur peut demander à supprimer une vidéo (DELETE id_video). Le serveur contrôle que la vidéo existe et la 
+supprime.  
+L'utilisateur peut demander à voir une vidéo (WATCH id_video). Le serveur contrôle que la vidéo existe, l'encode en 
+Base64 et l'envoie au client. Le client le télécharge et le decode dans un fichier temporaire. Une fois le fichier 
+télécharger, le client lance l'application VLC et joue la vidéo. Une fois le visionnage terminé, le fichier temporaire 
+s'efface.  
 
-This section defines the transport protocol used by the application protocol:
+Lorsqu'une commande a fini de s'exécuter (normalement ou avec une erreur), le serveur retourne en attente des messages 
+client.  
+En cas d'erreur, le client affichera un code d'erreur ainsi qu'un message permettant d'identifier le problème.  
 
-    What protocol(s) is/are involved? On which port(s)?
-    How are messages/actions encoded?
-    How are messages/actions delimited?
-    How are messages/actions treated (text or binary)?
-    Who initiates/closes the communication?
-    What happens on an unknown message/action/exception?
+Lorsque le client a fini d'utiliser le service, il utilise le message (QUIT) pour terminer la connexion.
 
 Section 3 - Messages
 
