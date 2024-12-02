@@ -5,6 +5,7 @@ import ch.heigvd.dai.Video;
 import ch.heigvd.dai.protocol.Command;
 import ch.heigvd.dai.protocol.CommandException;
 import ch.heigvd.dai.protocol.CommandResponse;
+import ch.heigvd.dai.protocol.CommandResponseCode;
 import ch.heigvd.dai.server.StreamingVideo;
 
 import java.io.IOException;
@@ -28,7 +29,7 @@ public class ListCommand extends Command {
                     .append(video.getDescription()).append(";");
         }
 
-        return new CommandResponse(200, response.toString());
+        return new CommandResponse(CommandResponseCode.OK, response.toString());
     }
 
     @Override

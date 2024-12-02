@@ -39,7 +39,7 @@ public abstract class Command {
         String[] parts = responseLine.split(" ", 2);
         int code = Integer.parseInt(parts[0]);
         String message = parts.length > 1 ? parts[1] : "";
-        return new CommandResponse(code, message);
+        return new CommandResponse(CommandResponseCode.valueOf(String.valueOf(code)), message);
     }
 
     public abstract void validate(String[] args) throws CommandException;

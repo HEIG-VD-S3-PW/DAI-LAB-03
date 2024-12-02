@@ -5,6 +5,7 @@ import ch.heigvd.dai.Video;
 import ch.heigvd.dai.protocol.Command;
 import ch.heigvd.dai.protocol.CommandException;
 import ch.heigvd.dai.protocol.CommandResponse;
+import ch.heigvd.dai.protocol.CommandResponseCode;
 import ch.heigvd.dai.server.StreamingVideo;
 
 import java.io.*;
@@ -28,13 +29,13 @@ public class WatchCommand extends Command {
     public CommandResponse execute(User user, StreamingVideo streamingVideo, String[] args) {
         String videoChoice = args[0];
         if (!streamingVideo.checkValidity(videoChoice)) {
-            return new CommandResponse(404, "Video not found");
+            return new CommandResponse(CommandResponseCode.NOT_FOUND, "Video not found");
         }
 
         Video video = streamingVideo.getVideo(videoChoice);
 
         try {
-            sendResponse(new CommandResponse(200, "Starting video stream: " + video.getTitle()));
+            // sendResponse(new CommandResponse(200, "Starting video stream: " + video.getTitle()));
 
             try (FileInputStream fis = new FileInputStream(video.getURL())) {
 
@@ -59,9 +60,9 @@ public class WatchCommand extends Command {
                 out.flush();
             }
 
-            return new CommandResponse(200, "Video stream completed");
+            return new CommandResponse(CommandResponseCode.OK, "Video stream completed");
         } catch (IOException e) {
-            return new CommandResponse(500, "Error streaming video: " + e.getMessage());
+            return new CommandResponse(CommandResponseCode.ERROR, "Error streaming video: " + e.getMessage());
         }
     }
 
