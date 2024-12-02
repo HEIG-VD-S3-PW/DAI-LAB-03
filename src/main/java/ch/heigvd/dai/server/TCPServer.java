@@ -15,12 +15,13 @@ import java.util.regex.Pattern;
 
 public class TCPServer {
     private static final int port = 1986;
-    private static StreamingVideo streamingVideo;
+    private static final StreamingVideo streamingVideo = new StreamingVideo();
     private static final int NUMBER_OF_THREADS = 10;
 
     public static void main(String[] args) throws IOException {
         try (ServerSocket serverSocket = new ServerSocket(port); ) {
             while (!serverSocket.isClosed()) {
+                System.out.println("Server listening for connections on port: " + port);
                 Socket clientSocket = serverSocket.accept();
                 Thread clientThread = new Thread(new ClientHandler(clientSocket));
                 clientThread.start();

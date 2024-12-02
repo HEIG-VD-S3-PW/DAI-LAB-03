@@ -75,7 +75,4 @@ public class SignInServerProcess extends Process {
             return false;
         return pat.matcher(email).matches();
     }
-
-
-
 }
