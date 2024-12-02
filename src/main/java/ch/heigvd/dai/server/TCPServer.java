@@ -9,59 +9,25 @@ import ch.heigvd.dai.protocol.CommandRegistry;
 
 import java.net.*;
 import java.io.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.regex.Pattern;
 
 public class TCPServer {
-    private int port;
-    private ServerSocket serverSocket;
-    private static StreamingVideo streamingVideo;
+    private static final int port = 1986;
+    private static final StreamingVideo streamingVideo = new StreamingVideo();
+    private static final int NUMBER_OF_THREADS = 10;
 
-    public TCPServer(int port) throws IOException {
-        this.port = port;
-
-        streamingVideo = new StreamingVideo();
-        streamingVideo.load();
-
-        try {
-            // server is listening on port 1234
-            serverSocket = new ServerSocket(port);
-            serverSocket.setReuseAddress(true);
-
-            // running infinite loop for getting
-            // client request
-            while (true) {
-
-                // socket object to receive incoming client
-                // requests
-                Socket client = serverSocket.accept();
-
-                // Displaying that new client is connected
-                // to server
-                System.out.println("New client connected "
-                        + client.getInetAddress()
-                        .getHostAddress());
-
-                // create a new thread object
-                ClientHandler clientSock
-                        = new ClientHandler(client);
-
-                // This thread will handle the client
-                // separately
-                new Thread(clientSock).start();
+    public static void main(String[] args) throws IOException {
+        try (ServerSocket serverSocket = new ServerSocket(port); ) {
+            while (!serverSocket.isClosed()) {
+                System.out.println("Server listening for connections on port: " + port);
+                Socket clientSocket = serverSocket.accept();
+                Thread clientThread = new Thread(new ClientHandler(clientSocket));
+                clientThread.start();
             }
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-        finally {
-            if (serverSocket != null) {
-                try {
-                    serverSocket.close();
-                }
-                catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+        } catch (IOException e) {
+            System.out.println("[Server] exception: " + e);
         }
     }
 
@@ -78,7 +44,8 @@ public class TCPServer {
         public void run()
         {
 
-            try (BufferedWriter out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
+            try (clientSocket;
+                    BufferedWriter out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
                  BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))
             ){
 

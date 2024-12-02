@@ -2,16 +2,16 @@ package ch.heigvd.dai.protocol;
 
 public class CommandResponse {
 
-    private final int code;
+    private final CommandResponseCode code;
     private final String message;
 
-    public CommandResponse(int code, String message) {
+    public CommandResponse(CommandResponseCode code, String message) {
         this.code = code;
         this.message = message;
     }
 
     public int getCode() {
-        return code;
+        return code.getCode();
     }
 
     public String getMessage() {
