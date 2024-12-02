@@ -15,6 +15,7 @@ public class StreamingVideo {
     public StreamingVideo(){
         users = new ArrayList<>();
         videos = new ArrayList<>();
+        this.load();
     }
 
     String getFileExtension(String filename) {
@@ -53,7 +54,6 @@ public class StreamingVideo {
             }
 
             addVideo(new Video (videoData[0], videoData[1], video.getName()));
-            System.out.println(videoData[0] + " " + videoData[1] + " " + video.getName());
         }
 
     }
@@ -72,6 +72,15 @@ public class StreamingVideo {
 
     public List<Video> getVideos() {
         return videos;
+    }
+
+    public String videosToString(){
+        String result = "\nChoose a video from this list:\n";
+        int counter = 0;
+        for(Video video : videos){
+            result += counter++ + ": " + video.toString() + "\n";
+        }
+        return result;
     }
 
     /**
