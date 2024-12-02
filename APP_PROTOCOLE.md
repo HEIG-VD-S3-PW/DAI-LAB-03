@@ -31,7 +31,32 @@ En cas d'erreur, le client affichera un code d'erreur ainsi qu'un message permet
 
 Lorsque le client a fini d'utiliser le service, il utilise le message (QUIT) pour terminer la connexion.
 
-Section 3 - Messages
+## 3. Messages
+
+### Lister les vidéos
+
+Le client demande au serveur la liste des vidéos.
+  
+#### Message
+
+```text
+LIST
+```  
+
+#### Réponse  
+
+Dans tout les cas, le serveur va répondre avec un code et un message.
+
+- ``` <CommandResponseCode> <Message>```
+
+    - Message pour code ```OK``` : 
+  ```text
+  1) <video_1>
+  2) <video_2>
+  ...
+  n) <video_n>
+  ```
+    - Message pour code ``` 
 
 This section defines the messages that can be exchanged between the client and the server.
 
