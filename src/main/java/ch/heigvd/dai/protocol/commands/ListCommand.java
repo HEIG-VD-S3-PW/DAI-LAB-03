@@ -20,6 +20,10 @@ public class ListCommand extends Command {
 
     @Override
     public CommandResponse execute(User user, StreamingVideo streamingVideo, String[] args) {
+        if (streamingVideo.getVideos().isEmpty())
+            return new CommandResponse(CommandResponseCode.ERROR,
+                    "No videos available in StreamingVideo");
+
         StringBuilder response = new StringBuilder();
         for(int i = 0; i < streamingVideo.getVideos().size(); i++){
             Video video = streamingVideo.getVideos().get(i);
