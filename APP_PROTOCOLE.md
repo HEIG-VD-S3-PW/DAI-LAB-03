@@ -49,14 +49,16 @@ Dans tout les cas, le serveur va répondre avec un code et un message.
 
 - ``` <CommandResponseCode> <Message>```
 
-    - Message pour code ```OK``` : 
+    - Pour le code ```OK```, on reçoit en message la liste des vidéos : 
   ```text
-  1) <video_1>
-  2) <video_2>
-  ...
-  n) <video_n>
+  <nbr_1>,<title_1>,<description_1>;<nbr_2>,<title_2>,<description_2>;...;<nbr_n>,<title_n>,<description_n>;
   ```
-    - Message pour code ``` 
+    - Message pour code ```ERROR```
+  ```text
+  No videos available in StreamingVideo 
+  ```
+  
+
 
 This section defines the messages that can be exchanged between the client and the server.
 
