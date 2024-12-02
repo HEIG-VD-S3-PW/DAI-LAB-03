@@ -1,12 +1,16 @@
 # Amar Streaming Platform
 
 ## 1. Overview  
-Le protocole "Amar Streaming Platform" (ASP) est un protocole permettant de télécharger une vidéo depuis le serveur et de la streamer au
-client en utilisant son lecteur de media [VLC](https://www.videolan.org/vlc/index.fr.html).
+Le protocole "Amar Streaming Platform" (ASP) est un protocole permettant de télécharger une vidéo depuis le serveur et 
+de la streamer au client en utilisant son lecteur de media [VLC](https://www.videolan.org/vlc/index.fr.html).
 
 
 ## 2. Transport protocol 
-
+ASP utilise le protocole TCP pour la connexion, les messages et l'envoie de la vidéo.
+Par défaut, le port à utiliser est 1986.
+L'échange de message et l'envoie de la vidéo se fait en texte. 
+C'est le clients qui initie la connection. Il se charge aussi de fermer la connexion.
+Les erreurs sont gérées par le serveur. Lorsqu'une erreur apparaît, le serveur notifie le client concerné. 
 
 
 This section defines the transport protocol used by the application protocol:
