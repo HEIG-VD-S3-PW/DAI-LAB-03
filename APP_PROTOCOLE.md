@@ -13,6 +13,7 @@ C'est le clients qui initie la connection. Il se charge aussi de fermer la conne
 Les erreurs sont gérées par le serveur. Lorsqu'une erreur apparaît, le serveur notifie le client concerné. 
 
 
+
 This section defines the transport protocol used by the application protocol:
 
     What protocol(s) is/are involved? On which port(s)?
