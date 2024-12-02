@@ -4,6 +4,7 @@ import ch.heigvd.dai.User;
 import ch.heigvd.dai.protocol.Command;
 import ch.heigvd.dai.protocol.CommandException;
 import ch.heigvd.dai.protocol.CommandResponse;
+import ch.heigvd.dai.protocol.CommandResponseCode;
 import ch.heigvd.dai.server.StreamingVideo;
 
 public class DeleteCommand extends Command {
@@ -22,12 +23,12 @@ public class DeleteCommand extends Command {
     public CommandResponse execute(User user, StreamingVideo streamingVideo, String[] args) {
         String videoChoice = args[0];
         if (!streamingVideo.checkValidity(videoChoice)) {
-            return new CommandResponse(404, "Video not found");
+            return new CommandResponse(CommandResponseCode.NOT_FOUND, "Video not found");
         }
 
         streamingVideo.getVideos().remove(Integer.parseInt(videoChoice) - 1);
 
-        return new CommandResponse(200, "Video deleted");
+        return new CommandResponse(CommandResponseCode.OK, "Video deleted");
     }
 
     @Override
