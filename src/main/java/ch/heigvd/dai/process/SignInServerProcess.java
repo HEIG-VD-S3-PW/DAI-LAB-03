@@ -25,8 +25,9 @@ public class SignInServerProcess extends Process {
         String pseudo = in.readLine();
 
         while(pseudo.isEmpty()) {
-            out.write("Invalid entry." + "\n");
+            out.write("INVALID\n");
             out.flush();
+            pseudo = in.readLine();
         }
 
         out.write("Valid pseudo" + "\n");
@@ -37,7 +38,7 @@ public class SignInServerProcess extends Process {
         String email = in.readLine();
 
         while(!emailValidation(email)){
-            out.write("Invalid entry." + "\n");
+            out.write("INVALID\n");
             out.flush();
             email = in.readLine();
         }
@@ -47,13 +48,15 @@ public class SignInServerProcess extends Process {
 
         System.out.println("Client email is : " + email);
 
+        out.write(streamingVideo.videosToString());
+        out.write("END\n");
+        out.flush();
 
         User user = new User(pseudo, email);
 
         streamingVideo.addUser(user);
 
         this.user = user;
-
     }
 
     public User getUser() {
@@ -74,5 +77,14 @@ public class SignInServerProcess extends Process {
         if (email == null)
             return false;
         return pat.matcher(email).matches();
+    }
+
+    private boolean choiceValidation(String choice){
+        try{
+            return Integer.parseInt(choice) >= 0 && Integer.parseInt(choice) < streamingVideo.getVideos().size();
+        }
+        catch(NumberFormatException e){
+            return false;
+        }
     }
 }

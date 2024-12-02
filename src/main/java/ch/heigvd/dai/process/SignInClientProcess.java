@@ -23,11 +23,11 @@ public class SignInClientProcess extends Process {
         do{
             System.out.print("Enter your pseudo: ");
             String pseudo = scanner.nextLine();
-            out.write(pseudo + "\n");
+            out.write("CONNECT pseudo " + pseudo + "\n");
             out.flush();
             response = in.readLine();
 
-        }while(response.equals("Invalid entry."));
+        }while(response.equals("INVALID"));
 
         do{
             System.out.print("Enter your email: ");
@@ -36,7 +36,19 @@ public class SignInClientProcess extends Process {
             out.flush();
             response = in.readLine();
 
-        }while(response.equals("Invalid entry."));
+        }while(response.equals("INVALID"));
+
+        while(!(response = in.readLine()).equals("END")){
+            System.out.println(response);
+        }
+
+        do{
+            System.out.print("Enter your choice: ");
+            String choice = scanner.nextLine();
+            out.write(choice + "\n");
+            out.flush();
+            response = in.readLine();
+        }while(response.equals("INVALID"));
     }
 
 }
