@@ -205,6 +205,18 @@ After that, the CONNECT command ask for the connection and, if it is accepted, t
 - WATCH <id> : Watch the video with the <id> number 
 - UPLOAD: Upload a video
 
+Example with the command LIST:
+
+```bash
+> LIST
+1) 3 Minute Timer - Displays a timer from 3 minutes to 0
+2) Google Office tour - Visit of Google's building
+3) L'entretien - Choss - Vidéo de Choss sur un entretien
+4) Le Clown - Choss - Vidéo de Choss sur un clown
+5) Why is Switzerland home to so many billionaires - Documentary on Switzerland's billionaires
+>
+```
+
 ---
 
 ## Command Summary
