@@ -36,10 +36,25 @@ public abstract class Command {
         if (responseLine == null) {
             throw new IOException("Connexion fermée");
         }
+
         String[] parts = responseLine.split(" ", 2);
         int code = Integer.parseInt(parts[0]);
         String message = parts.length > 1 ? parts[1] : "";
-        return new CommandResponse(CommandResponseCode.valueOf(String.valueOf(code)), message);
+
+        // Convertir le code numérique en CommandResponseCode
+        CommandResponseCode responseCode = null;
+        for (CommandResponseCode c : CommandResponseCode.values()) {
+            if (c.getCode() == code) {
+                responseCode = c;
+                break;
+            }
+        }
+
+        if (responseCode == null) {
+            throw new IOException("Code de réponse invalide: " + code);
+        }
+
+        return new CommandResponse(responseCode, message);
     }
 
     public abstract void validate(String[] args) throws CommandException;

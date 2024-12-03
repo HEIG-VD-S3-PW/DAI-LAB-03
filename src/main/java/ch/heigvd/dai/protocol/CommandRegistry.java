@@ -1,9 +1,6 @@
 package ch.heigvd.dai.protocol;
 
-import ch.heigvd.dai.protocol.commands.ConnectCommand;
-import ch.heigvd.dai.protocol.commands.DeleteCommand;
-import ch.heigvd.dai.protocol.commands.ListCommand;
-import ch.heigvd.dai.protocol.commands.WatchCommand;
+import ch.heigvd.dai.protocol.commands.*;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -26,6 +23,7 @@ public class CommandRegistry {
         registerCommand(new ListCommand());
         registerCommand(new DeleteCommand());
         registerCommand(new ConnectCommand());
+        registerCommand(new UploadCommand());
     }
 
     public void registerCommand(Command command) {

@@ -4,6 +4,7 @@ import ch.heigvd.dai.User;
 import ch.heigvd.dai.protocol.Command;
 import ch.heigvd.dai.protocol.CommandException;
 import ch.heigvd.dai.protocol.CommandResponse;
+import ch.heigvd.dai.protocol.CommandResponseCode;
 import ch.heigvd.dai.server.StreamingVideo;
 
 import java.util.regex.Pattern;
@@ -20,21 +21,22 @@ public class ConnectCommand extends Command {
         }
     }
 
+    @Override
     public CommandResponse execute(User user, StreamingVideo streamingVideo, String[] args) {
         String pseudo = args[0];
         String email = args[1];
 
         if(pseudo.isEmpty()){
-            return new CommandResponse(404, "Invalid pseudo");
+            return new CommandResponse(CommandResponseCode.ERROR, "Invalid pseudo");
         }
 
         if (!emailValidation(email)) {
-            return new CommandResponse(404, "Invalid email address");
+            return new CommandResponse(CommandResponseCode.ERROR, "Invalid email address");
         }
 
         streamingVideo.addUser(new User(pseudo, email));
 
-        return new CommandResponse(200, "Connection successful");
+        return new CommandResponse(CommandResponseCode.OK, "Connection successful");
     }
 
     @Override
@@ -47,7 +49,7 @@ public class ConnectCommand extends Command {
                 return;
             }
 
-            System.out.println(response.getMessage());
+            System.out.println("Vous êtes connectés !");
 
         } catch (Exception e) {
             System.err.println("Error while connecting the user: " + e.getMessage());

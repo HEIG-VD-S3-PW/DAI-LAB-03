@@ -43,9 +43,6 @@ public class TCPServer {
                  BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))
             ){
 
-                out.write("Welcome to the Amar Streaming Platform !" + "\n");
-                out.flush();
-
                 CommandRegistry registry = new CommandRegistry(in, out);
                 ServerCommandHandler protocolHandler = new ServerCommandHandler(registry, in, out, null, streamingVideo);
 
