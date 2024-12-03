@@ -12,6 +12,8 @@ public class StreamingVideo {
     private List<User> users;
     private List<Video> videos;
 
+    public static final String videoPath = System.getProperty("user.dir") + "/videos";
+
     public StreamingVideo(){
         users = new ArrayList<>();
         videos = new ArrayList<>();
@@ -31,7 +33,6 @@ public class StreamingVideo {
 
     public void load(){
 
-        String videoPath = System.getProperty("user.dir") + "/videos";
         File directory = new File(videoPath);
 
         File[] videos = directory.listFiles();
@@ -52,7 +53,6 @@ public class StreamingVideo {
                 System.err.println("Invalid format: " + video.getName());
                 return;
             }
-
             addVideo(new Video (videoData[0], videoData[1], video.getName()));
         }
 

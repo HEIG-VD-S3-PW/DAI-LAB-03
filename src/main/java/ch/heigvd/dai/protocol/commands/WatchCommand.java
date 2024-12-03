@@ -35,7 +35,8 @@ public class WatchCommand extends Command {
         Video video = streamingVideo.getVideo(videoChoice);
 
         try {
-            // sendResponse(new CommandResponse(200, "Starting video stream: " + video.getTitle()));
+
+            sendResponse(new CommandResponse(CommandResponseCode.OK, "Starting video stream: " + videoChoice));
 
             try (FileInputStream fis = new FileInputStream(video.getURL())) {
 

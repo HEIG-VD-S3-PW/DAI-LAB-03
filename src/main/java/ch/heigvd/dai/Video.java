@@ -1,5 +1,7 @@
 package ch.heigvd.dai;
 
+import ch.heigvd.dai.server.StreamingVideo;
+
 public class Video {
     private String title;
     private String description;
@@ -8,7 +10,7 @@ public class Video {
     public Video(String title, String description, String URL) {
         this.title = title;
         this.description = description;
-        this.URL = URL;
+        this.URL = StreamingVideo.videoPath + "/" + URL;
     }
 
     public String getTitle(){
