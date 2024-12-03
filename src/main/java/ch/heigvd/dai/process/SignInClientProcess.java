@@ -18,9 +18,6 @@ public class SignInClientProcess extends Process {
     @Override
     public void execute() throws Exception {
 
-        String response = in.readLine();
-        System.out.println(response);
-
         String pseudo = "";
         do{
             System.out.print("Enter your pseudo: ");
@@ -36,7 +33,6 @@ public class SignInClientProcess extends Process {
         out.write("CONNECT" + " " + pseudo + " " + email + "\n");
         out.flush();
 
-        response = in.readLine();
     }
 
     /**

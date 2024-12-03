@@ -4,6 +4,7 @@ import ch.heigvd.dai.User;
 import ch.heigvd.dai.protocol.Command;
 import ch.heigvd.dai.protocol.CommandRegistry;
 import ch.heigvd.dai.protocol.CommandResponse;
+import ch.heigvd.dai.protocol.CommandResponseCode;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -32,7 +33,7 @@ public class ServerCommandHandler {
 
         Command command = registry.getCommand(commandName);
         if (command == null) {
-            sendResponse(new CommandResponse(400, "Commande inconnue: " + commandName));
+            sendResponse(new CommandResponse(CommandResponseCode.ERROR, "Commande inconnue: " + commandName));
             return;
         }
 
@@ -47,7 +48,7 @@ public class ServerCommandHandler {
             sendResponse(response);
 
         } catch (Exception e) {
-            sendResponse(new CommandResponse(500, "Erreur serveur: " + e.getMessage()));
+            sendResponse(new CommandResponse(CommandResponseCode.ERROR, "Erreur serveur: " + e.getMessage()));
         }
     }
 

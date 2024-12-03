@@ -3,6 +3,7 @@ package ch.heigvd.dai.client;
 // https://www.geeksforgeeks.org/multithreaded-servers-in-java/
 
 import ch.heigvd.dai.process.SignInClientProcess;
+import ch.heigvd.dai.process.UploadProcess;
 import ch.heigvd.dai.protocol.Command;
 import ch.heigvd.dai.protocol.CommandRegistry;
 
@@ -33,6 +34,23 @@ public class TCPClient {
                 if (input.equalsIgnoreCase("quit")) {
                     break;
                 }
+
+                if (input.equalsIgnoreCase("upload")) {
+                    try {
+                        UploadProcess uploadProcess = new UploadProcess(in, out);
+                        uploadProcess.execute();
+                        Command uploadCommand = registry.getCommand("UPLOAD");
+                        if (uploadCommand != null) {
+                            uploadCommand.receive();
+                        } else {
+                            System.out.println("✗ Erreur: Commande UPLOAD non trouvée dans le registre");
+                        }
+                    } catch (Exception e) {
+                        System.out.println("✗ Erreur pendant l'upload: " + e.getMessage());
+                    }
+                    continue;
+                }
+
 
                 String[] parts = input.split(" ", 2);
                 String commandName = parts[0].toUpperCase();
