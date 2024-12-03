@@ -13,6 +13,7 @@ import ch.heigvd.dai.server.StreamingVideo;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Base64;
 
@@ -29,18 +30,22 @@ public class UploadCommand extends Command {
 
     @Override
     public CommandResponse execute(User user, StreamingVideo streamingVideo, String[] args) {
-        String title = Arrays.toString(Base64.getDecoder().decode(args[0]));
-        String description = Arrays.toString(Base64.getDecoder().decode(args[1]));
+        String title = new String(Base64.getDecoder().decode(args[0]), StandardCharsets.UTF_8);
+        String description = new String(Base64.getDecoder().decode(args[1]), StandardCharsets.UTF_8);
 
         System.out.println("Uploading video: " + title + " with description: " + description);
 
-        try (FileOutputStream fos = new FileOutputStream("videos/" + title)) {
+        // Création du nom de fichier encodé
+        String fileData = title + "|" + description;
+        String encodedFileName = Base64.getEncoder().encodeToString(fileData.getBytes(StandardCharsets.UTF_8));
+        String fullFileName = encodedFileName + ".mp4";
+
+        try (FileOutputStream fos = new FileOutputStream("videos/" + fullFileName)) {
             String line;
             while ((line = in.readLine()) != null) {
                 if (line.equals("END_OF_UPLOAD")) {
                     break;
                 }
-                // Décoder et écrire uniquement les lignes qui ne sont pas des marqueurs
                 byte[] chunk = Base64.getDecoder().decode(line);
                 fos.write(chunk);
             }
@@ -50,7 +55,7 @@ public class UploadCommand extends Command {
             return new CommandResponse(CommandResponseCode.ERROR, "Error uploading video: " + e.getMessage());
         }
 
-        streamingVideo.addVideo(new Video(title, description, "videos/" + title));
+        streamingVideo.addVideo(new Video(title, description, fullFileName));
 
         return new CommandResponse(CommandResponseCode.OK, "Video uploaded successfully");
     }

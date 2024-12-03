@@ -47,7 +47,6 @@ public class ListCommand extends Command {
                 return;
             }
 
-            System.out.println("Message: " + response.getMessage());
             String[] videos = response.getMessage().split(";");
 
             for(String video : videos) {

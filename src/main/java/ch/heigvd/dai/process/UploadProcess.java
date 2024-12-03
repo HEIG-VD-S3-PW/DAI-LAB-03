@@ -24,7 +24,6 @@ public class UploadProcess extends Process {
         String path = getValidInput("Enter the path of the video: ");
 
         File videoFile = validateFile(path);
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
 
         title = Base64.getEncoder().encodeToString(title.getBytes());
         description = Base64.getEncoder().encodeToString(description.getBytes());
@@ -49,9 +48,6 @@ public class UploadProcess extends Process {
                     System.arraycopy(buffer, 0, toEncode, 0, bytesRead);
                 }
 
-                // Mise à jour du checksum
-                md.update(toEncode);
-
                 // Envoi du chunk encodé
                 String chunk = Base64.getEncoder().encodeToString(toEncode);
                 out.write(chunk + "\n");
@@ -64,7 +60,6 @@ public class UploadProcess extends Process {
             }
 
             // Envoi du checksum
-            String checksum = Base64.getEncoder().encodeToString(md.digest());
             out.write("END_OF_UPLOAD" + "\n");
             out.flush();
 
