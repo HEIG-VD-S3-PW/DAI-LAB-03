@@ -5,7 +5,16 @@ import java.util.concurrent.Callable;
 import ch.heigvd.dai.server.TCPServer;
 import picocli.CommandLine;
 
-@CommandLine.Command(name = "server", description = "Start the server part.")
+@CommandLine.Command(
+        name = "Server",
+        description = "Start the server to accept remote connections",
+        headerHeading = "\n=== Server Command ===\n\n",    // Adds a header for better separation
+        synopsisHeading = "\nUsage: ",
+        descriptionHeading = "\nDescription:\n",
+        parameterListHeading = "\nArguments:\n",
+        optionListHeading = "\nOptions:\n",
+        footer = "\nCredits: Tristan Baud, Arno Tribolet and Mathieu Emery"
+)
 public class Server implements Callable<Integer> {
 
     @CommandLine.Option(
