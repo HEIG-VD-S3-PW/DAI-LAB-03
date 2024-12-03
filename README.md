@@ -82,7 +82,71 @@ java -jar target/DAI-LAB-03-1.0-SNAPSHOT.jar --help
 Output:
 
 ```vbnet
+======= Amar Streaming Platform =======
 
+Watch, add and remove videos from/to a remote server
+
+Usage: DAI-LAB-03-1.0-SNAPSHOT.jar [-hV] [COMMAND]
+
+Description:
+A command-line utility to stream videos from a remote server.
+
+Options:
+  -h, --help      Show this help message and exit.
+  -V, --version   Print version information and exit.
+
+Commands:
+  Client  Start the client to connect to the streaming server.
+  Server  Start the server to accept remote connections
+
+Credits: Tristan Baud, Arno Tribolet and Mathieu Emery
+```
+
+The commands "Client" and "Server" also have a custom help page:
+
+```bash
+java -jar target/DAI-LAB-03-1.0-SNAPSHOT.jar Client --help
+```
+
+```vbnet
+=== Client Command ===
+
+Usage: DAI-LAB-03-1.0-SNAPSHOT.jar Client -H=<host> [-p=<port>]
+
+Description:
+Start the client to connect to the streaming server.
+
+Once connected the following commands are available:
+DELETE <id>   Delete a video that you select with it's number.
+LIST          Show all videos from the server
+WATCH <id>    Watch a specific video by using it's number
+UPLOAD        Upload a new video
+
+Options:
+  -H, --host=<host>   Host to connect to.
+  -p, --port=<port>   Port to use (default: 1986).
+
+Credits: Tristan Baud, Arno Tribolet and Mathieu Emery
+
+```
+
+```bash
+java -jar target/DAI-LAB-03-1.0-SNAPSHOT.jar Server --help
+```
+
+```vbnet
+=== Server Command ===
+
+
+Usage: DAI-LAB-03-1.0-SNAPSHOT.jar Server [-p=<port>]
+
+Description:
+Start the server to accept remote connections
+
+Options:
+  -p, --port=<port>   Port to use (default: 1986).
+
+Credits: Tristan Baud, Arno Tribolet and Mathieu Emery
 
 ```
 
@@ -134,7 +198,12 @@ Enter your pseudo: toto
 Enter your email: toto@exemple.com
 ```
 
-(Manque encore la partie UDP et l'affichage des vidéos que je mettrai lorsque les entrées utilisateur seront mieux gérées)
+After that, the CONNECT command ask for the connection and, if it is accepted, the client will be able to use the following commands at will:
+
+- DELETE <id> : Delete the video with the <id> number 
+- LIST: List all videos on the server
+- WATCH <id> : Watch the video with the <id> number 
+- UPLOAD: Upload a video
 
 ---
 
