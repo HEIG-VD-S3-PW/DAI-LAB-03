@@ -22,8 +22,7 @@ public class TCPClient {
 
             CommandRegistry registry = new CommandRegistry(in, out);
 
-            SignInClientProcess signInClientProcess = new SignInClientProcess(in, out);
-            signInClientProcess.execute();
+
 
             while(!socket.isClosed()) {
 
@@ -33,6 +32,22 @@ public class TCPClient {
 
                 if (input.equalsIgnoreCase("quit")) {
                     break;
+                }
+
+                if (input.equalsIgnoreCase("connect")) {
+                    try {
+                        SignInClientProcess signInClientProcess = new SignInClientProcess(in, out);
+                        signInClientProcess.execute();
+                        Command connectCommand = registry.getCommand("CONNECT");
+                        if (connectCommand != null) {
+                            connectCommand.receive();
+                        } else {
+                            System.out.println("✗ Erreur: Commande CONNECT non trouvée dans le registre");
+                        }
+                    } catch (Exception e) {
+                        System.out.println("✗ Erreur pendant la connexion: " + e.getMessage());
+                    }
+                    continue;
                 }
 
                 if (input.equalsIgnoreCase("upload")) {

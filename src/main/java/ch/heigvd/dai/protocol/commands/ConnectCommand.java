@@ -21,6 +21,7 @@ public class ConnectCommand extends Command {
         }
     }
 
+    @Override
     public CommandResponse execute(User user, StreamingVideo streamingVideo, String[] args) {
         String pseudo = args[0];
         String email = args[1];
@@ -48,7 +49,7 @@ public class ConnectCommand extends Command {
                 return;
             }
 
-            System.out.println(response.getMessage());
+            System.out.println("Vous êtes connectés !");
 
         } catch (Exception e) {
             System.err.println("Error while connecting the user: " + e.getMessage());

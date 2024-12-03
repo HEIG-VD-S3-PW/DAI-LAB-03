@@ -39,6 +39,7 @@ public class ListCommand extends Command {
     @Override
     public void receive() {
         try {
+
             CommandResponse response = readResponse();
 
             if(response.getCode() != 200){
@@ -46,6 +47,7 @@ public class ListCommand extends Command {
                 return;
             }
 
+            System.out.println("Message: " + response.getMessage());
             String[] videos = response.getMessage().split(";");
 
             for(String video : videos) {
@@ -57,6 +59,7 @@ public class ListCommand extends Command {
                     }
                 }
             }
+
 
         } catch (IOException e) {
             System.err.println("Error while listing videos: " + e.getMessage());
