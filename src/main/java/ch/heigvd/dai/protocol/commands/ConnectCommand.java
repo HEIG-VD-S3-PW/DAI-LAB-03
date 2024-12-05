@@ -9,7 +9,7 @@ import ch.heigvd.dai.protocol.CommandResponseCode;
 import ch.heigvd.dai.server.ServerCommandHandler;
 import ch.heigvd.dai.server.StreamingVideo;
 
-import java.util.regex.Pattern;
+import ch.heigvd.dai.Utils;
 
 public class ConnectCommand extends Command {
 
@@ -36,8 +36,12 @@ public class ConnectCommand extends Command {
             return new CommandResponse(CommandResponseCode.ERROR, "Invalid pseudo");
         }
 
-        if (!emailValidation(email)) {
+        if (!Utils.emailValidation(email)) {
             return new CommandResponse(CommandResponseCode.ERROR, "Invalid email address");
+        }
+
+        if(streamingVideo.userExists(pseudo, email)){
+            return new CommandResponse(CommandResponseCode.ERROR, "User already exists");
         }
 
         User newUser = new User(pseudo, email);
@@ -62,22 +66,6 @@ public class ConnectCommand extends Command {
         } catch (Exception e) {
             System.err.println("Error while connecting the user: " + e.getMessage());
         }
-    }
-
-    /**
-     * Check if the entered email is valid
-     * @param email : Email entered by the user
-     * @return true if valid and false otherwise
-     */
-    private boolean emailValidation(String email){
-        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\."+
-                "[a-zA-Z0-9_+&*-]+)*@" +
-                "(?:[a-zA-Z0-9-]+\\.)+[a-z" +
-                "A-Z]{2,7}$";
-        Pattern pat = Pattern.compile(emailRegex);
-        if (email == null)
-            return false;
-        return pat.matcher(email).matches();
     }
 
     public User getCreatedUser() {

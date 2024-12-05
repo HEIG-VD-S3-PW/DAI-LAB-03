@@ -78,6 +78,15 @@ public class StreamingVideo {
         return videos;
     }
 
+    public boolean userExists(String pseudo, String email){
+        for(User user : users){
+            if(user.getUsername().equalsIgnoreCase(pseudo) || user.getEmail().equalsIgnoreCase(email)){
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     /**
      * Check if the video choice is valid

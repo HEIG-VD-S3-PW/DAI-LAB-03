@@ -13,9 +13,7 @@ public class QuitCommand extends Command {
     public QuitCommand() { super("QUIT", "Close connection with the server"); }
 
     @Override
-    public void validate(String[] args) throws CommandException {
-        if (args.length != 0) args = new String[0];
-    }
+    public void validate(String[] args) throws CommandException {}
 
     @Override
     public CommandResponse execute(StreamingVideo streamingVideo, String[] args) {

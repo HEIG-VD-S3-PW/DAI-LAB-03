@@ -1,5 +1,7 @@
 package ch.heigvd.dai.process;
 
+import ch.heigvd.dai.Utils;
+
 import java.io.*;
 import java.util.Base64;
 import java.util.Scanner;
@@ -16,9 +18,9 @@ public class UploadProcess extends Process {
 
     @Override
     public void execute() throws Exception {
-        String title = getValidInput("Enter the title of the video: ");
-        String description = getValidInput("Enter the description of the video: ");
-        String path = getValidInput("Enter the path of the video: ");
+        String title = Utils.askForInput("Enter the title of the video: ", null);
+        String description = Utils.askForInput("Enter the description of the video: ", null);
+        String path = Utils.askForInput("Enter the path of the video file: ", null);
 
         File videoFile = validateFile(path);
 
@@ -62,14 +64,6 @@ public class UploadProcess extends Process {
         }
     }
 
-    private String getValidInput(String prompt) {
-        System.out.print(prompt);
-        String input = scanner.nextLine().trim();
-        if (input.isEmpty()) {
-            throw new IllegalArgumentException("Input cannot be empty");
-        }
-        return input;
-    }
 
     private File validateFile(String path) throws IOException {
         File file = new File(path);
