@@ -11,9 +11,7 @@ public class QuitCommand extends Command {
 
     @Override
     public void validate(String[] args) throws CommandException {
-        if (args.length != 0) {
-            throw new CommandException("The QUIT command expects no argument");
-        }
+        if (args.length != 0) args = new String[0];
     }
 
     @Override
@@ -26,12 +24,12 @@ public class QuitCommand extends Command {
         try {
             CommandResponse response = readResponse();
             if(response.getCode() != 200){
-               System.err.println("Error while quitting service: " + response.getMessage());
+               System.err.println("Error while quitting ASP: " + response.getMessage());
                return;
             }
             System.out.println(response.getMessage());
         } catch (Exception e) {
-            System.err.println("Error while quitting services: " + e.getMessage());
+            System.err.println("Error while quitting ASP: " + e.getMessage());
         }
     }
 }
