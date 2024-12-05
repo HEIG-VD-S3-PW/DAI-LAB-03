@@ -52,17 +52,14 @@ public class ServerCommandHandler {
 
         try {
 
-            // Validation des arguments
             command.validate(args);
 
-            // Exécution
             CommandResponse response = command.execute(user, streamingVideo, args);
 
             if(command instanceof ConnectCommand connectCommand && user == null){
-                setUser(connectCommand.getCreatedUser());
+                this.user = connectCommand.getCreatedUser();
             }
 
-            // Envoi de la réponse
             if (response != null){
                 sendResponse(response);
             }
@@ -82,7 +79,5 @@ public class ServerCommandHandler {
         Utils.send(out, response.getCode() + " " + response.getMessage());
     }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
+
 }

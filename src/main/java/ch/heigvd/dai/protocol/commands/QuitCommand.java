@@ -18,18 +18,20 @@ public class QuitCommand extends Command {
     @Override
     public CommandResponse execute(User user, StreamingVideo streamingVideo, String[] args) {
 
-
         if(user != null && streamingVideo.userExists(user.getUsername(), user.getEmail())){
             streamingVideo.removeUser(user);
         }
+
         return new CommandResponse(CommandResponseCode.OK, "See you soon :)");
     }
 
     @Override
     public void receive() {
         try {
+
             CommandResponse response = readResponse();
             System.out.println(response.getMessage());
+
         } catch (Exception e) {
             System.err.println("Error while quitting : " + e.getMessage());
         }

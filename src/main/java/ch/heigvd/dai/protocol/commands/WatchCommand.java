@@ -30,7 +30,9 @@ public class WatchCommand extends Command {
 
     @Override
     public CommandResponse execute(User user, StreamingVideo streamingVideo, String[] args) {
+
         String videoChoice = args[0];
+
         if (!streamingVideo.checkValidity(videoChoice)) {
             return new CommandResponse(CommandResponseCode.NOT_FOUND, "Video not found");
         }
@@ -39,10 +41,10 @@ public class WatchCommand extends Command {
         File videoFile = new File(video.getURL());
 
         try {
-            // Envoyer la taille du fichier
+
+            // Send the file size
             sendResponse(new CommandResponse(CommandResponseCode.OK, String.valueOf(videoFile.length())));
 
-            // Envoyer le fichier en chunks encodés en Base64
             try (FileInputStream fis = new FileInputStream(videoFile)) {
                 byte[] buffer = new byte[BUFFER_SIZE];
                 int bytesRead;
@@ -54,11 +56,12 @@ public class WatchCommand extends Command {
                     );
                     Utils.send(out, encodedChunk);
                 }
-                // Envoyer un marqueur de fin
+
                 Utils.send(out, END_MARKER);
             }
 
             return null;
+
         } catch (IOException e) {
             return new CommandResponse(CommandResponseCode.ERROR, "Error streaming video: " + e.getMessage());
         }
@@ -66,11 +69,14 @@ public class WatchCommand extends Command {
 
     @Override
     public void receive() {
+
         File tempFile = null;
         Process process = null;
 
         try {
+
             CommandResponse response = readResponse();
+
             if (response.getCode() != 200) {
                 System.out.println(response.getMessage());
                 return;
@@ -80,8 +86,8 @@ public class WatchCommand extends Command {
             tempFile = File.createTempFile("video_", ".mp4");
             tempFile.deleteOnExit();
 
-            // Recevoir le fichier
             try (FileOutputStream fos = new FileOutputStream(tempFile)) {
+
                 String line;
                 long totalReceived = 0;
 
@@ -97,38 +103,44 @@ public class WatchCommand extends Command {
                     System.out.printf("\rDownloading: %.1f%%", (totalReceived * 100.0) / fileSize);
                 }
                 System.out.println("\nDownload complete!");
+
             }
 
-            String absolutePath = tempFile.getAbsolutePath();
-            String os = System.getProperty("os.name").toLowerCase();
-            ProcessBuilder processBuilder;
-
-            if (os.contains("win")) {
-                processBuilder = new ProcessBuilder("cmd", "/c", "start", absolutePath);
-            } else if (os.contains("mac")) {
-                processBuilder = new ProcessBuilder("open", absolutePath);
-            } else {
-                processBuilder = new ProcessBuilder("xdg-open", absolutePath);
-            }
-
-            process = processBuilder.start();
-
-            // Attendre un peu pour laisser le temps au lecteur de démarrer
-            Thread.sleep(2000);
+            process = openVideoPlayer(tempFile.getAbsolutePath());
+            Thread.sleep(2000); // Wait to let the video player open the file
 
 
         } catch (Exception e) {
             System.err.println("Error while watching video: " + e.getMessage());
         } finally {
-            if (process != null) {
-                process.destroy();
-            }
-            if (tempFile != null && tempFile.exists()) {
-                try {
-                    Files.delete(tempFile.toPath());
-                } catch (IOException e) {
-                    System.err.println("Error deleting temp file: " + e.getMessage());
-                }
+            cleanupResources(process, tempFile);
+        }
+    }
+
+    private Process openVideoPlayer(String filePath) throws IOException {
+        String os = System.getProperty("os.name").toLowerCase();
+        ProcessBuilder processBuilder;
+
+        if (os.contains("win")) {
+            processBuilder = new ProcessBuilder("cmd", "/c", "start", filePath);
+        } else if (os.contains("mac")) {
+            processBuilder = new ProcessBuilder("open", filePath);
+        } else {
+            processBuilder = new ProcessBuilder("xdg-open", filePath);
+        }
+
+        return processBuilder.start();
+    }
+
+    private void cleanupResources(Process process, File tempFile) {
+        if (process != null) {
+            process.destroy();
+        }
+        if (tempFile != null && tempFile.exists()) {
+            try {
+                Files.delete(tempFile.toPath());
+            } catch (IOException e) {
+                System.err.println("Error deleting temp file: " + e.getMessage());
             }
         }
     }

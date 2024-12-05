@@ -27,8 +27,7 @@ public abstract class Command {
     }
 
     protected void sendResponse(CommandResponse response) throws IOException {
-        out.write(response.getCode() + " " + response.getMessage() + "\n");
-        out.flush();
+        Utils.send(out, response.getCode() + " " + response.getMessage());
     }
 
     public CommandResponse readResponse() throws IOException {
@@ -40,9 +39,5 @@ public abstract class Command {
     public abstract CommandResponse execute(User user, StreamingVideo streamingVideo, String[] args);
 
     public abstract void receive();
-
-    protected void updateServerState(ServerCommandHandler handler, User newUser) {
-        handler.setUser(newUser);
-    }
 
 }

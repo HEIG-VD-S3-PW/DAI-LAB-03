@@ -62,4 +62,10 @@ public class Utils {
     }
 
 
+    public static String getFileExtension(String fileName) {
+        int lastDot = fileName.lastIndexOf(".");
+        return lastDot > 0 ? fileName.substring(lastDot + 1) : "";
+    }
+
+
 }

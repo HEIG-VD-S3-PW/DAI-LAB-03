@@ -6,14 +6,18 @@ import ch.heigvd.dai.protocol.CommandRegistry;
 
 import java.net.*;
 import java.io.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class TCPServer {
+
     private static final int port = 1986;
     private static final StreamingVideo streamingVideo = new StreamingVideo();
     private static final int NUMBER_OF_THREADS = 10;
 
     public static void main(String[] args) throws IOException {
-        try (ServerSocket serverSocket = new ServerSocket(port)) {
+        try (ServerSocket serverSocket = new ServerSocket(port);
+             ExecutorService executor = Executors.newFixedThreadPool(NUMBER_OF_THREADS)) {
 
             System.out.println("Server listening for connections on port: " + port);
 
@@ -22,26 +26,21 @@ public class TCPServer {
 
                 System.out.println("New client connected: " + clientSocket.getInetAddress().getHostAddress());
 
-                Thread clientThread = new Thread(new ClientHandler(clientSocket));
-                clientThread.start();
+                executor.submit(new ClientHandler(clientSocket));
             }
         } catch (IOException e) {
             System.out.println("[Server] exception: " + e);
         }
     }
 
-    // ClientHandler class
     private static class ClientHandler implements Runnable {
         private final Socket clientSocket;
 
-        // Constructor
-        public ClientHandler(Socket socket)
-        {
+        public ClientHandler(Socket socket) {
             this.clientSocket = socket;
         }
 
-        public void run()
-        {
+        public void run() {
 
             try (clientSocket;
                     BufferedWriter out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));

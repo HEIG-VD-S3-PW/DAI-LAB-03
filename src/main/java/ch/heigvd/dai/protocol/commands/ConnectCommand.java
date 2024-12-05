@@ -52,6 +52,7 @@ public class ConnectCommand extends Command {
     @Override
     public void receive() {
         try {
+
             CommandResponse response = readResponse();
             System.out.println(response.getMessage());
 

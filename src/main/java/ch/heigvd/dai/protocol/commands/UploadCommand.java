@@ -29,6 +29,7 @@ public class UploadCommand extends Command {
 
     @Override
     public CommandResponse execute(User user, StreamingVideo streamingVideo, String[] args) {
+
         String title = new String(Base64.getDecoder().decode(args[0]), StandardCharsets.UTF_8);
         String description = new String(Base64.getDecoder().decode(args[1]), StandardCharsets.UTF_8);
 
@@ -44,19 +45,14 @@ public class UploadCommand extends Command {
 
 
         System.out.println("Receiving video: " + title + " with description: " + description);
-
-        // Création du nom de fichier encodé
-        String fileData = title + "|" + description;
-        String encodedFileName = Base64.getEncoder().encodeToString(fileData.getBytes(StandardCharsets.UTF_8));
-        String fullFileName = encodedFileName + ".mp4";
+        String fullFileName = streamingVideo.encodeVideoName(title, description);
 
         try {
-            // Lire la taille du fichier
+
             String sizeLine = in.readLine();
             long fileSize = Long.parseLong(sizeLine);
             System.out.println("Expected file size: " + fileSize + " bytes");
 
-            // Créer le fichier de destination
             try (FileOutputStream fos = new FileOutputStream("videos/" + fullFileName)) {
                 String line;
                 long totalReceived = 0;
@@ -87,8 +83,10 @@ public class UploadCommand extends Command {
     @Override
     public void receive() {
         try {
+
             CommandResponse response = readResponse();
             System.out.println(response.getMessage());
+
         } catch (IOException e) {
             System.err.println("Error while uploading video: " + e.getMessage());
         }

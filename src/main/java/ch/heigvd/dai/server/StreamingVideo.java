@@ -8,6 +8,8 @@ import java.util.Base64;
 import java.util.List;
 import java.io.File;
 
+import ch.heigvd.dai.utils.Utils;
+
 public class StreamingVideo {
     private List<User> users;
     private List<Video> videos;
@@ -20,43 +22,59 @@ public class StreamingVideo {
         this.load();
     }
 
-    String getFileExtension(String filename) {
-        if (filename == null) {
-            return null;
+
+    public void load() {
+        File directory = new File(videoPath);
+        File[] videoFiles = directory.listFiles();
+
+        if (videoFiles == null) {
+            System.err.println("Error : the video directory is unreachable : " + videoPath);
+            return;
         }
-        int dotIndex = filename.lastIndexOf(".");
-        if (dotIndex >= 0) {
-            return filename.substring(dotIndex + 1);
+
+        for (File videoFile : videoFiles) {
+            try {
+                if (!isValidVideoFile(videoFile)) {
+                    System.err.println("Invalid video file (ignored) : " + videoFile.getName());
+                    continue;
+                }
+
+                Video video = decodeVideoFile(videoFile.getName());
+                addVideo(video);
+
+            } catch (IllegalArgumentException e) {
+                System.err.println(e.getMessage());
+            }
         }
-        return "";
     }
 
-    public void load(){
+    public String encodeVideoName(String title, String description) {
+        String videoData = title + "|" + description;
+        byte[] encodedBytes = Base64.getEncoder().encode(videoData.getBytes());
+        return new String(encodedBytes) + ".mp4";
+    }
 
-        File directory = new File(videoPath);
-
-        File[] videos = directory.listFiles();
-
-        assert videos != null;
-        for(File video : videos){
-            if(!getFileExtension(video.getName()).equals("mp4")){
-                System.err.println("Invalid format: " + video.getName());
-                return;
-            }
-            String encodedString = video.getName().substring(0, video.getName().lastIndexOf("."));
-            byte[] decodedBytes = Base64.getDecoder().decode(encodedString);
+    private Video decodeVideoFile(String fileName) {
+        try {
+            String encodedName = fileName.substring(0, fileName.lastIndexOf("."));
+            byte[] decodedBytes = Base64.getDecoder().decode(encodedName);
             String decodedString = new String(decodedBytes);
 
             String[] videoData = decodedString.split("\\|");
-
-            if(videoData.length != 2){
-                System.err.println("Invalid format: " + video.getName());
-                return;
+            if (videoData.length != 2) {
+                throw new IllegalArgumentException("Invalid format for " + fileName);
             }
-            addVideo(new Video (videoData[0], videoData[1], video.getName()));
-        }
 
+            return new Video(videoData[0], videoData[1], fileName);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid format for " + fileName);
+        }
     }
+
+    public static boolean isValidVideoFile(File file) {
+        return file.isFile() && Utils.getFileExtension(file.getName()).equals("mp4");
+    }
+
 
     public void addUser(User user){
         users.add(user);
@@ -87,18 +105,12 @@ public class StreamingVideo {
         return false;
     }
 
-
-    /**
-     * Check if the video choice is valid
-     * @param videoChoice: index of the chosen video
-     * @return true if the index is valid and false otherwise
-     */
     public boolean checkValidity(String videoChoice){
+
         int index = 0;
         try{
             index = Integer.parseInt(videoChoice);
-        }
-        catch(NumberFormatException e){
+        } catch(NumberFormatException e){
             return false;
         }
 

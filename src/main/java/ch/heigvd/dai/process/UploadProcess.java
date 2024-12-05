@@ -25,14 +25,12 @@ public class UploadProcess extends Process {
 
         File videoFile = validateFile(path);
 
-        // Encoder le titre et la description en Base64
         String encodedTitle = Base64.getEncoder().encodeToString(title.getBytes());
         String encodedDesc = Base64.getEncoder().encodeToString(description.getBytes());
 
-        // Envoyer la commande d'upload avec titre et description
         Utils.send(out, "UPLOAD " + encodedTitle + " " + encodedDesc);
 
-        // Attendre la réponse du serveur
+        // Wait for server confirmation (to be sure the user is connected)
         CommandResponse response = Utils.readResponse(in);
         if(response.getCode() != CommandResponseCode.OK.getCode()){
             System.err.println(response.getMessage());
@@ -40,10 +38,8 @@ public class UploadProcess extends Process {
         }
         System.out.println(response.getMessage());
 
-        // Envoyer la taille du fichier
         Utils.send(out, videoFile.length());
 
-        // Envoyer le fichier en chunks
         try (FileInputStream fis = new FileInputStream(videoFile)) {
             byte[] buffer = new byte[BUFFER_SIZE];
             int bytesRead;
@@ -65,6 +61,7 @@ public class UploadProcess extends Process {
             Utils.send(out, END_MARKER);
 
             System.out.println("\nUpload complete! Waiting for server confirmation...");
+
         }catch (IOException e){
             System.err.println("Error while uploading video: " + e.getMessage());
             return false;
@@ -84,6 +81,9 @@ public class UploadProcess extends Process {
         }
         if (file.length() == 0) {
             throw new IOException("File is empty: " + path);
+        }
+        if(!Utils.getFileExtension(file.getName()).equals("mp4")){
+            throw new IOException("Invalid file format: " + path);
         }
         return file;
     }

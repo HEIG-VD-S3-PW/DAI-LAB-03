@@ -53,22 +53,23 @@ public class TCPClient {
     private boolean handleSpecialCommand(String input, BufferedReader in, BufferedWriter out, CommandRegistry registry) {
         try {
             if (input.equalsIgnoreCase("connect")) {
-                return executeProcess(new SignInClientProcess(in, out), "CONNECT", registry);
+                executeProcess(new SignInClientProcess(in, out), "CONNECT", registry);
+                return true;
             }
             if (input.toLowerCase().startsWith("upload")) {
-                return executeProcess(new UploadProcess(in, out), "UPLOAD", registry);
+                executeProcess(new UploadProcess(in, out), "UPLOAD", registry);
+                return true;
             }
             return false;
         } catch (Exception e) {
-            System.out.println("✗ Error: " + e.getMessage());
+            System.out.println("Error: " + e.getMessage());
             return true;
         }
     }
 
-    private boolean executeProcess(Process process, String commandName, CommandRegistry registry) throws Exception {
-        if (!process.execute()) return true;
+    private void executeProcess(Process process, String commandName, CommandRegistry registry) throws Exception {
+        if (!process.execute()) return;
         Command command = registry.getCommand(commandName);
         if (command != null) command.receive();
-        return true;
     }
 }

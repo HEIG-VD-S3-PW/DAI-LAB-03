@@ -9,6 +9,8 @@ import ch.heigvd.dai.protocol.CommandResponseCode;
 import ch.heigvd.dai.server.StreamingVideo;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 public class ListCommand extends Command {
     public ListCommand() {
@@ -33,7 +35,7 @@ public class ListCommand extends Command {
                     .append(video.getDescription()).append(";");
         }
 
-        return new CommandResponse(CommandResponseCode.OK, response.toString());
+        return new CommandResponse(CommandResponseCode.OK, Base64.getEncoder().encodeToString(response.toString().getBytes()));
     }
 
     @Override
@@ -47,11 +49,11 @@ public class ListCommand extends Command {
                 return;
             }
 
-            String[] videos = response.getMessage().split(";");
+            String list = new String(Base64.getDecoder().decode(response.getMessage()), StandardCharsets.UTF_8);
+            String[] videos = list.split(";");
 
             for(String video : videos) {
                 if(!video.isEmpty()) {
-                    // Split par "," pour avoir index, titre, description
                     String[] parts = video.split(",");
                     if(parts.length == 3) {
                         System.out.println(parts[0] + ") " + parts[1] + " - " + parts[2]);
