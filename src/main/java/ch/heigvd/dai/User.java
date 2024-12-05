@@ -9,6 +9,10 @@ public class User {
         this.email = email;
     }
 
+    public boolean compare(User u1, User u2) {
+       return u1.getUsername().equals(u2.getUsername()) && u1.getEmail().equals(u2.getEmail());
+    }
+
     public String getUsername(){
         return username;
     }
