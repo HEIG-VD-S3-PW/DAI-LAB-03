@@ -3,6 +3,7 @@ package ch.heigvd.dai.client;
 // https://www.geeksforgeeks.org/multithreaded-servers-in-java/
 
 import ch.heigvd.dai.process.SignInClientProcess;
+import ch.heigvd.dai.process.UploadProcess;
 import ch.heigvd.dai.protocol.Command;
 import ch.heigvd.dai.protocol.CommandRegistry;
 
@@ -21,8 +22,7 @@ public class TCPClient {
 
             CommandRegistry registry = new CommandRegistry(in, out);
 
-            SignInClientProcess signInClientProcess = new SignInClientProcess(in, out);
-            signInClientProcess.execute();
+
 
             while(!socket.isClosed()) {
 
@@ -33,6 +33,39 @@ public class TCPClient {
                 if (input.equalsIgnoreCase("quit")) {
                     break;
                 }
+
+                if (input.equalsIgnoreCase("connect")) {
+                    try {
+                        SignInClientProcess signInClientProcess = new SignInClientProcess(in, out);
+                        signInClientProcess.execute();
+                        Command connectCommand = registry.getCommand("CONNECT");
+                        if (connectCommand != null) {
+                            connectCommand.receive();
+                        } else {
+                            System.out.println("✗ Erreur: Commande CONNECT non trouvée dans le registre");
+                        }
+                    } catch (Exception e) {
+                        System.out.println("✗ Erreur pendant la connexion: " + e.getMessage());
+                    }
+                    continue;
+                }
+
+                if (input.equalsIgnoreCase("upload")) {
+                    try {
+                        UploadProcess uploadProcess = new UploadProcess(in, out);
+                        uploadProcess.execute();
+                        Command uploadCommand = registry.getCommand("UPLOAD");
+                        if (uploadCommand != null) {
+                            uploadCommand.receive();
+                        } else {
+                            System.out.println("✗ Erreur: Commande UPLOAD non trouvée dans le registre");
+                        }
+                    } catch (Exception e) {
+                        System.out.println("✗ Erreur pendant l'upload: " + e.getMessage());
+                    }
+                    continue;
+                }
+
 
                 String[] parts = input.split(" ", 2);
                 String commandName = parts[0].toUpperCase();

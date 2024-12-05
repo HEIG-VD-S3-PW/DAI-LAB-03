@@ -2,16 +2,10 @@ package ch.heigvd.dai.server;
 
 // https://www.geeksforgeeks.org/multithreaded-servers-in-java/
 
-import ch.heigvd.dai.User;
-import ch.heigvd.dai.Video;
-import ch.heigvd.dai.process.SignInServerProcess;
 import ch.heigvd.dai.protocol.CommandRegistry;
 
 import java.net.*;
 import java.io.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.regex.Pattern;
 
 public class TCPServer {
     private static final int port = 1986;
@@ -49,19 +43,8 @@ public class TCPServer {
                  BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))
             ){
 
-                out.write("Welcome to the Amar Streaming Platform !" + "\n");
-                out.flush();
-
-                SignInServerProcess signInServerProcess = new SignInServerProcess(in, out, streamingVideo);
-                signInServerProcess.execute();
-
-                if(signInServerProcess.getUser() == null){
-                    return;
-                }
-                User user = signInServerProcess.getUser();
-
                 CommandRegistry registry = new CommandRegistry(in, out);
-                ServerCommandHandler protocolHandler = new ServerCommandHandler(registry, in, out, user, streamingVideo);
+                ServerCommandHandler protocolHandler = new ServerCommandHandler(registry, in, out, null, streamingVideo);
 
                 while(!clientSocket.isClosed()){
 

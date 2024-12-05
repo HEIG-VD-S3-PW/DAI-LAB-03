@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.PrintWriter;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 public class SignInClientProcess extends Process {
 
@@ -17,38 +18,37 @@ public class SignInClientProcess extends Process {
     @Override
     public void execute() throws Exception {
 
-        String response = in.readLine();
-        System.out.println(response);
-
+        String pseudo = "";
         do{
             System.out.print("Enter your pseudo: ");
-            String pseudo = scanner.nextLine();
-            out.write("CONNECT pseudo " + pseudo + "\n");
-            out.flush();
-            response = in.readLine();
+            pseudo = scanner.nextLine();
+        }while(pseudo.isEmpty());
 
-        }while(response.equals("INVALID"));
-
+        String email = "";
         do{
             System.out.print("Enter your email: ");
-            String email = scanner.nextLine();
-            out.write(email + "\n");
-            out.flush();
-            response = in.readLine();
+            email = scanner.nextLine();
+        }while(!emailValidation(email));
 
-        }while(response.equals("INVALID"));
+        out.write("CONNECT" + " " + pseudo + " " + email + "\n");
+        out.flush();
 
-        while(!(response = in.readLine()).equals("END")){
-            System.out.println(response);
-        }
+    }
 
-        do{
-            System.out.print("Enter your choice: ");
-            String choice = scanner.nextLine();
-            out.write(choice + "\n");
-            out.flush();
-            response = in.readLine();
-        }while(response.equals("INVALID"));
+    /**
+     * Check if the entered email is valid
+     * @param email : Email entered by the user
+     * @return true if valid and false otherwise
+     */
+    private boolean emailValidation(String email){
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\."+
+                "[a-zA-Z0-9_+&*-]+)*@" +
+                "(?:[a-zA-Z0-9-]+\\.)+[a-z" +
+                "A-Z]{2,7}$";
+        Pattern pat = Pattern.compile(emailRegex);
+        if (email == null)
+            return false;
+        return pat.matcher(email).matches();
     }
 
 }
