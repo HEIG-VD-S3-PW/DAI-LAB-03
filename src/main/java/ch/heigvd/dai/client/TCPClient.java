@@ -1,104 +1,75 @@
 package ch.heigvd.dai.client;
 
-// https://www.geeksforgeeks.org/multithreaded-servers-in-java/
-
+import ch.heigvd.dai.process.Process;
 import ch.heigvd.dai.process.SignInClientProcess;
 import ch.heigvd.dai.process.UploadProcess;
 import ch.heigvd.dai.protocol.Command;
 import ch.heigvd.dai.protocol.CommandRegistry;
+import ch.heigvd.dai.protocol.commands.QuitCommand;
 
 import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
 
 public class TCPClient {
-
-    public TCPClient(String host, int port) throws IOException {
-
-        try (Socket socket = new Socket(host, port);
-            BufferedWriter out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))
+    public TCPClient(String host, int port) {
+        try (
+                Socket socket = new Socket(host, port);
+                BufferedWriter out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                Scanner scanner = new Scanner(System.in)
         ) {
-
             CommandRegistry registry = new CommandRegistry(in, out);
 
+            System.out.print("COMMANDS AVAILABLE: ");
+            registry.getCommands().forEach((k, v) -> System.out.print(k + " "));
+            System.out.println();
 
-
-            while(!socket.isClosed()) {
-
+            while (!socket.isClosed()) {
                 System.out.print("> ");
-                Scanner sc = new Scanner(System.in);
-                String input = sc.nextLine().trim();
+                String input = scanner.nextLine().trim();
 
-                if (input.equalsIgnoreCase("quit")) {
-                    try {
-                        Command command = registry.getCommand("QUIT");
-                        if (command != null) {
-                            out.write("QUIT\n");
-                            out.flush();
-                            command.receive();
-                        } else {
-                            System.out.println("✗ Erreur: Commande QUIT non trouvée dans le registre");
-                        }
-                    } catch (Exception e) {
-                        System.out.println("Erreur durant la déconnexion :" + e.getMessage());
-                    }
-                    break;
-                }
+                if (input.isEmpty()) continue;
 
-                if (input.equalsIgnoreCase("connect")) {
-                    try {
-                        SignInClientProcess signInClientProcess = new SignInClientProcess(in, out);
-                        signInClientProcess.execute();
-                        Command connectCommand = registry.getCommand("CONNECT");
-                        if (connectCommand != null) {
-                            connectCommand.receive();
-                        } else {
-                            System.out.println("✗ Erreur: Commande CONNECT non trouvée dans le registre");
-                        }
-                    } catch (Exception e) {
-                        System.out.println("✗ Erreur pendant la connexion: " + e.getMessage());
-                    }
-                    continue;
-                }
+                if (handleSpecialCommand(input, in, out, registry)) continue;
 
-                if (input.equalsIgnoreCase("upload")) {
-                    try {
-                        UploadProcess uploadProcess = new UploadProcess(in, out);
-                        uploadProcess.execute();
-                        Command uploadCommand = registry.getCommand("UPLOAD");
-                        if (uploadCommand != null) {
-                            uploadCommand.receive();
-                        } else {
-                            System.out.println("✗ Erreur: Commande UPLOAD non trouvée dans le registre");
-                        }
-                    } catch (Exception e) {
-                        System.out.println("✗ Erreur pendant l'upload: " + e.getMessage());
-                    }
-                    continue;
-                }
-
-
-                String[] parts = input.split(" ", 2);
-                String commandName = parts[0].toUpperCase();
-
-                Command command = registry.getCommand(commandName);
+                Command command = registry.getCommand(input.split(" ")[0].toUpperCase());
                 if (command == null) {
-                    System.out.println("✗ Commande inconnue: " + commandName);
+                    System.out.println("Unknown command: " + input);
                     continue;
                 }
 
-                // Envoi au serveur
                 out.write(input + "\n");
                 out.flush();
-
-                // Réception de la réponse
                 command.receive();
-            }
 
+                if (command instanceof QuitCommand) break;
+            }
+        } catch (IOException e) {
+            System.out.println("Error: " + e.getMessage());
         }
-        catch (Exception e) {
-            System.out.println("Error in the connection: " + e.getMessage());
+    }
+
+    private boolean handleSpecialCommand(String input, BufferedReader in, BufferedWriter out, CommandRegistry registry) {
+        try {
+            if (input.equalsIgnoreCase("connect")) {
+                executeProcess(new SignInClientProcess(in, out), "CONNECT", registry);
+                return true;
+            }
+            if (input.toLowerCase().startsWith("upload")) {
+                executeProcess(new UploadProcess(in, out), "UPLOAD", registry);
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+            return true;
         }
+    }
+
+    private void executeProcess(Process process, String commandName, CommandRegistry registry) throws Exception {
+        if (!process.execute()) return;
+        Command command = registry.getCommand(commandName);
+        if (command != null) command.receive();
     }
 }

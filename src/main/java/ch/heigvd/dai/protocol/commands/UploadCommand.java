@@ -1,7 +1,7 @@
 package ch.heigvd.dai.protocol.commands;
 
-import ch.heigvd.dai.User;
-import ch.heigvd.dai.Video;
+import ch.heigvd.dai.objects.User;
+import ch.heigvd.dai.objects.Video;
 import ch.heigvd.dai.protocol.Command;
 import ch.heigvd.dai.protocol.CommandException;
 import ch.heigvd.dai.protocol.CommandResponse;
@@ -29,23 +29,30 @@ public class UploadCommand extends Command {
 
     @Override
     public CommandResponse execute(User user, StreamingVideo streamingVideo, String[] args) {
+
         String title = new String(Base64.getDecoder().decode(args[0]), StandardCharsets.UTF_8);
         String description = new String(Base64.getDecoder().decode(args[1]), StandardCharsets.UTF_8);
 
-        System.out.println("Receiving video: " + title + " with description: " + description);
-
-        // Création du nom de fichier encodé
-        String fileData = title + "|" + description;
-        String encodedFileName = Base64.getEncoder().encodeToString(fileData.getBytes(StandardCharsets.UTF_8));
-        String fullFileName = encodedFileName + ".mp4";
+        if(user == null){
+            return new CommandResponse(CommandResponseCode.ERROR, "You must be connected to upload a video");
+        }
 
         try {
-            // Lire la taille du fichier
+            sendResponse(new CommandResponse(CommandResponseCode.OK, "Ready to receive video"));
+        }catch (IOException e){
+            return new CommandResponse(CommandResponseCode.ERROR, "Error while uploading video: " + e.getMessage());
+        }
+
+
+        System.out.println("Receiving video: " + title + " with description: " + description);
+        String fullFileName = streamingVideo.encodeVideoName(title, description);
+
+        try {
+
             String sizeLine = in.readLine();
             long fileSize = Long.parseLong(sizeLine);
             System.out.println("Expected file size: " + fileSize + " bytes");
 
-            // Créer le fichier de destination
             try (FileOutputStream fos = new FileOutputStream("videos/" + fullFileName)) {
                 String line;
                 long totalReceived = 0;
@@ -76,12 +83,10 @@ public class UploadCommand extends Command {
     @Override
     public void receive() {
         try {
+
             CommandResponse response = readResponse();
-            if (response.getCode() != 200) {
-                System.err.println("Error while uploading video: " + response.getMessage());
-                return;
-            }
             System.out.println(response.getMessage());
+
         } catch (IOException e) {
             System.err.println("Error while uploading video: " + e.getMessage());
         }
