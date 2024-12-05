@@ -11,7 +11,9 @@ public class QuitCommand extends Command {
 
     @Override
     public void validate(String[] args) throws CommandException {
-
+        if (args.length != 0) {
+            throw new CommandException("The QUIT command expects no argument");
+        }
     }
 
     @Override
