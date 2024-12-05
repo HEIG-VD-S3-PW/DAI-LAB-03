@@ -13,10 +13,15 @@ public class TCPServer {
     private static final int NUMBER_OF_THREADS = 10;
 
     public static void main(String[] args) throws IOException {
-        try (ServerSocket serverSocket = new ServerSocket(port); ) {
+        try (ServerSocket serverSocket = new ServerSocket(port)) {
+
+            System.out.println("Server listening for connections on port: " + port);
+
             while (!serverSocket.isClosed()) {
-                System.out.println("Server listening for connections on port: " + port);
                 Socket clientSocket = serverSocket.accept();
+
+                System.out.println("New client connected: " + clientSocket.getInetAddress().getHostAddress());
+
                 Thread clientThread = new Thread(new ClientHandler(clientSocket));
                 clientThread.start();
             }
@@ -53,16 +58,15 @@ public class TCPServer {
                         continue;
                     }
 
-                    System.out.println("Command received: " + line);
-                    protocolHandler.handleLine(line);
+                    if(protocolHandler.handleLine(line)){
+                        clientSocket.close();
+                    }
 
                 }
 
             }
-            catch (IOException e) {
-                e.printStackTrace();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+            catch (Exception e) {
+                System.out.println("[ClientHandler] exception: " + e);
             }
         }
     }

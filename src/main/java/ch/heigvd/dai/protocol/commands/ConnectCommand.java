@@ -1,15 +1,13 @@
 package ch.heigvd.dai.protocol.commands;
 
-import ch.heigvd.dai.User;
-import ch.heigvd.dai.commands.Server;
+import ch.heigvd.dai.objects.User;
 import ch.heigvd.dai.protocol.Command;
 import ch.heigvd.dai.protocol.CommandException;
 import ch.heigvd.dai.protocol.CommandResponse;
 import ch.heigvd.dai.protocol.CommandResponseCode;
-import ch.heigvd.dai.server.ServerCommandHandler;
 import ch.heigvd.dai.server.StreamingVideo;
 
-import ch.heigvd.dai.Utils;
+import ch.heigvd.dai.utils.Utils;
 
 public class ConnectCommand extends Command {
 
@@ -28,7 +26,7 @@ public class ConnectCommand extends Command {
     }
 
     @Override
-    public CommandResponse execute(StreamingVideo streamingVideo, String[] args) {
+    public CommandResponse execute(User user, StreamingVideo streamingVideo, String[] args) {
         String pseudo = args[0];
         String email = args[1];
 
@@ -55,13 +53,7 @@ public class ConnectCommand extends Command {
     public void receive() {
         try {
             CommandResponse response = readResponse();
-
-            if(response.getCode() != 200){
-                System.err.println("Error while connecting the user: " + response.getMessage());
-                return;
-            }
-
-            System.out.println("Vous êtes connectés !");
+            System.out.println(response.getMessage());
 
         } catch (Exception e) {
             System.err.println("Error while connecting the user: " + e.getMessage());

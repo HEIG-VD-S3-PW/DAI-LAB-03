@@ -1,7 +1,7 @@
 package ch.heigvd.dai.server;
 
-import ch.heigvd.dai.User;
-import ch.heigvd.dai.Video;
+import ch.heigvd.dai.objects.User;
+import ch.heigvd.dai.objects.Video;
 
 import java.util.ArrayList;
 import java.util.Base64;
@@ -62,7 +62,7 @@ public class StreamingVideo {
         users.add(user);
     }
 
-    public boolean suppressUser(User user) {
+    public boolean removeUser(User user) {
         return users.remove(user);
     }
 

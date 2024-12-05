@@ -6,6 +6,7 @@ import ch.heigvd.dai.process.SignInClientProcess;
 import ch.heigvd.dai.process.UploadProcess;
 import ch.heigvd.dai.protocol.Command;
 import ch.heigvd.dai.protocol.CommandRegistry;
+import ch.heigvd.dai.protocol.commands.QuitCommand;
 
 import java.io.*;
 import java.net.Socket;
@@ -32,7 +33,9 @@ public class TCPClient {
                 if (input.equalsIgnoreCase("connect")) {
                     try {
                         SignInClientProcess signInClientProcess = new SignInClientProcess(in, out);
-                        signInClientProcess.execute();
+                        if(!signInClientProcess.execute()){
+                            continue;
+                        }
                         Command connectCommand = registry.getCommand("CONNECT");
                         if (connectCommand != null) {
                             connectCommand.receive();
@@ -48,7 +51,9 @@ public class TCPClient {
                 if (input.equalsIgnoreCase("upload") || input.toLowerCase().startsWith("upload ")) {
                     try {
                         UploadProcess uploadProcess = new UploadProcess(in, out);
-                        uploadProcess.execute();
+                        if(!uploadProcess.execute()){
+                            continue;
+                        }
                         Command uploadCommand = registry.getCommand("UPLOAD");
                         if (uploadCommand != null) {
                             uploadCommand.receive();
@@ -77,11 +82,26 @@ public class TCPClient {
 
                 // Réception de la réponse
                 command.receive();
+
+                if(command instanceof QuitCommand){
+                    break;
+                }
             }
 
         }
         catch (Exception e) {
             System.out.println("Error in the connection: " + e.getMessage());
         }
+    }
+
+    private void startProcess(String input) {
+
+        try {
+            ProcessBuilder pb = new ProcessBuilder("java", "-jar", "client.jar", input);
+            pb.start();
+        } catch (IOException e) {
+            System.out.println("✗ Erreur pendant le lancement du processus: " + e.getMessage());
+        }
+
     }
 }

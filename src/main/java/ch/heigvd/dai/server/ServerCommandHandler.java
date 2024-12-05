@@ -1,11 +1,12 @@
 package ch.heigvd.dai.server;
 
-import ch.heigvd.dai.User;
+import ch.heigvd.dai.objects.User;
 import ch.heigvd.dai.protocol.Command;
 import ch.heigvd.dai.protocol.CommandRegistry;
 import ch.heigvd.dai.protocol.CommandResponse;
 import ch.heigvd.dai.protocol.CommandResponseCode;
 import ch.heigvd.dai.protocol.commands.ConnectCommand;
+import ch.heigvd.dai.protocol.commands.QuitCommand;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -28,7 +29,7 @@ public class ServerCommandHandler {
         this.user = null;
     }
 
-    public void handleLine(String line) throws IOException {
+    public boolean handleLine(String line) throws IOException {
 
         String[] parts = line.split(" ", 2);
         String commandName = parts[0].toUpperCase();
@@ -36,14 +37,17 @@ public class ServerCommandHandler {
 
         Command command = registry.getCommand(commandName);
         if (command == null) {
-            sendResponse(new CommandResponse(CommandResponseCode.ERROR, "Commande inconnue: " + commandName));
-            return;
+            sendResponse(new CommandResponse(CommandResponseCode.ERROR, "Unknown command : " + commandName));
+            return false;
         }
 
-        if(user == null && !(command instanceof ConnectCommand)){
-            sendResponse(new CommandResponse(CommandResponseCode.ERROR, "Vous devez vous connecter pour effectuer cette action"));
-            return;
+        if(user == null && !(command instanceof ConnectCommand) && !(command instanceof QuitCommand)){
+            sendResponse(new CommandResponse(CommandResponseCode.ERROR, "You have to be connected to execute this command"));
+            return false;
         }
+
+        String sender = user != null ? user.getUsername() : "Not Authenticated";
+        System.out.println("[" + sender + "] " + line);
 
         try {
 
@@ -51,7 +55,7 @@ public class ServerCommandHandler {
             command.validate(args);
 
             // Exécution
-            CommandResponse response = command.execute(streamingVideo, args);
+            CommandResponse response = command.execute(user, streamingVideo, args);
 
             if(command instanceof ConnectCommand connectCommand && user == null){
                 setUser(connectCommand.getCreatedUser());
@@ -62,9 +66,15 @@ public class ServerCommandHandler {
                 sendResponse(response);
             }
 
+            if(command instanceof QuitCommand){
+                return true;
+            }
+
         } catch (Exception e) {
-            sendResponse(new CommandResponse(CommandResponseCode.ERROR, "Erreur serveur: " + e.getMessage()));
+            sendResponse(new CommandResponse(CommandResponseCode.ERROR, "Server error : " + e.getMessage()));
         }
+
+        return false;
     }
 
     private void sendResponse(CommandResponse response) throws IOException {

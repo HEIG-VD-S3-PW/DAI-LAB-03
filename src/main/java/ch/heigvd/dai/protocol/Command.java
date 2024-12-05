@@ -1,14 +1,12 @@
 package ch.heigvd.dai.protocol;
 
-import ch.heigvd.dai.User;
+import ch.heigvd.dai.objects.User;
 import ch.heigvd.dai.server.ServerCommandHandler;
 import ch.heigvd.dai.server.StreamingVideo;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.stream.Stream;
 
 public abstract class Command {
 
@@ -60,7 +58,7 @@ public abstract class Command {
 
     public abstract void validate(String[] args) throws CommandException;
 
-    public abstract CommandResponse execute(StreamingVideo streamingVideo, String[] args);
+    public abstract CommandResponse execute(User user, StreamingVideo streamingVideo, String[] args);
 
     public abstract void receive();
 

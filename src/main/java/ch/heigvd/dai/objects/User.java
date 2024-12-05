@@ -1,6 +1,4 @@
-package ch.heigvd.dai;
-
-import java.util.Objects;
+package ch.heigvd.dai.objects;
 
 public class User {
     private String username;
@@ -15,15 +13,8 @@ public class User {
         return username;
     }
 
-    public void setUsername(String username){
-        this.username = username;
-    }
-
     public String getEmail(){
         return email;
     }
 
-    public void setEmail(String email){
-        this.email = email;
-    }
 }

@@ -1,4 +1,4 @@
-package ch.heigvd.dai;
+package ch.heigvd.dai.objects;
 
 import ch.heigvd.dai.server.StreamingVideo;
 

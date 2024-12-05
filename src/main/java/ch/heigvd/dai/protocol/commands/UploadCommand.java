@@ -1,7 +1,7 @@
 package ch.heigvd.dai.protocol.commands;
 
-import ch.heigvd.dai.User;
-import ch.heigvd.dai.Video;
+import ch.heigvd.dai.objects.User;
+import ch.heigvd.dai.objects.Video;
 import ch.heigvd.dai.protocol.Command;
 import ch.heigvd.dai.protocol.CommandException;
 import ch.heigvd.dai.protocol.CommandResponse;
@@ -28,9 +28,20 @@ public class UploadCommand extends Command {
     }
 
     @Override
-    public CommandResponse execute(StreamingVideo streamingVideo, String[] args) {
+    public CommandResponse execute(User user, StreamingVideo streamingVideo, String[] args) {
         String title = new String(Base64.getDecoder().decode(args[0]), StandardCharsets.UTF_8);
         String description = new String(Base64.getDecoder().decode(args[1]), StandardCharsets.UTF_8);
+
+        if(user == null){
+            return new CommandResponse(CommandResponseCode.ERROR, "You must be connected to upload a video");
+        }
+
+        try {
+            sendResponse(new CommandResponse(CommandResponseCode.OK, "Ready to receive video"));
+        }catch (IOException e){
+            return new CommandResponse(CommandResponseCode.ERROR, "Error while uploading video: " + e.getMessage());
+        }
+
 
         System.out.println("Receiving video: " + title + " with description: " + description);
 
@@ -77,10 +88,6 @@ public class UploadCommand extends Command {
     public void receive() {
         try {
             CommandResponse response = readResponse();
-            if (response.getCode() != 200) {
-                System.err.println("Error while uploading video: " + response.getMessage());
-                return;
-            }
             System.out.println(response.getMessage());
         } catch (IOException e) {
             System.err.println("Error while uploading video: " + e.getMessage());

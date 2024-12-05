@@ -1,4 +1,4 @@
-package ch.heigvd.dai;
+package ch.heigvd.dai.utils;
 
 import java.util.Scanner;
 import java.util.function.Predicate;

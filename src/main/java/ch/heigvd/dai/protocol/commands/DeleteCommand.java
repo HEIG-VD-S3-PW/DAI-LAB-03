@@ -1,6 +1,6 @@
 package ch.heigvd.dai.protocol.commands;
 
-import ch.heigvd.dai.User;
+import ch.heigvd.dai.objects.User;
 import ch.heigvd.dai.protocol.Command;
 import ch.heigvd.dai.protocol.CommandException;
 import ch.heigvd.dai.protocol.CommandResponse;
@@ -20,7 +20,7 @@ public class DeleteCommand extends Command {
     }
 
     @Override
-    public CommandResponse execute(StreamingVideo streamingVideo, String[] args) {
+    public CommandResponse execute(User user, StreamingVideo streamingVideo, String[] args) {
         String videoChoice = args[0];
         if (!streamingVideo.checkValidity(videoChoice)) {
             return new CommandResponse(CommandResponseCode.NOT_FOUND, "Video not found");
@@ -34,13 +34,8 @@ public class DeleteCommand extends Command {
     @Override
     public void receive() {
         try {
+
             CommandResponse response = readResponse();
-
-            if(response.getCode() != 200){
-                System.err.println("Error while deleting video: " + response.getMessage());
-                return;
-            }
-
             System.out.println(response.getMessage());
 
         } catch (Exception e) {

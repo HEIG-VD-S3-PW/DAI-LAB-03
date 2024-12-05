@@ -1,6 +1,9 @@
 package ch.heigvd.dai.process;
 
-import ch.heigvd.dai.Utils;
+import ch.heigvd.dai.protocol.Command;
+import ch.heigvd.dai.protocol.CommandResponse;
+import ch.heigvd.dai.protocol.CommandResponseCode;
+import ch.heigvd.dai.utils.Utils;
 
 import java.io.*;
 import java.util.Base64;
@@ -17,7 +20,7 @@ public class UploadProcess extends Process {
     }
 
     @Override
-    public void execute() throws Exception {
+    public boolean execute() throws Exception {
         String title = Utils.askForInput("Enter the title of the video: ", null);
         String description = Utils.askForInput("Enter the description of the video: ", null);
         String path = Utils.askForInput("Enter the path of the video file: ", null);
@@ -31,6 +34,23 @@ public class UploadProcess extends Process {
         // Envoyer la commande d'upload avec titre et description
         out.write("UPLOAD " + encodedTitle + " " + encodedDesc + "\n");
         out.flush();
+
+        // Attendre la réponse du serveur
+        String responseLine = in.readLine();
+        if (responseLine == null) {
+            throw new IOException("Connexion fermée");
+        }
+
+        String[] parts = responseLine.split(" ", 2);
+        int code = Integer.parseInt(parts[0]);
+        String message = parts.length > 1 ? parts[1] : "";
+
+        if(code != CommandResponseCode.OK.getCode()){
+            System.err.println(message);
+            return false;
+        }
+
+        System.out.println(message);
 
         // Envoyer la taille du fichier
         out.write(videoFile.length() + "\n");
@@ -61,7 +81,12 @@ public class UploadProcess extends Process {
             out.flush();
 
             System.out.println("\nUpload complete! Waiting for server confirmation...");
+        }catch (IOException e){
+            System.err.println("Error while uploading video: " + e.getMessage());
+            return false;
         }
+
+        return true;
     }
 
 
