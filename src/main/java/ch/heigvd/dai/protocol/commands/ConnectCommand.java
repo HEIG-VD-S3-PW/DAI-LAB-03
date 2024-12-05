@@ -1,15 +1,21 @@
 package ch.heigvd.dai.protocol.commands;
 
 import ch.heigvd.dai.User;
+import ch.heigvd.dai.commands.Server;
 import ch.heigvd.dai.protocol.Command;
 import ch.heigvd.dai.protocol.CommandException;
 import ch.heigvd.dai.protocol.CommandResponse;
 import ch.heigvd.dai.protocol.CommandResponseCode;
+import ch.heigvd.dai.server.ServerCommandHandler;
 import ch.heigvd.dai.server.StreamingVideo;
 
 import java.util.regex.Pattern;
 
 public class ConnectCommand extends Command {
+
+
+    private User createdUser;
+
     public ConnectCommand() {
         super("CONNECT", "Connect the client with the server");
     }
@@ -22,7 +28,7 @@ public class ConnectCommand extends Command {
     }
 
     @Override
-    public CommandResponse execute(User user, StreamingVideo streamingVideo, String[] args) {
+    public CommandResponse execute(StreamingVideo streamingVideo, String[] args) {
         String pseudo = args[0];
         String email = args[1];
 
@@ -34,7 +40,9 @@ public class ConnectCommand extends Command {
             return new CommandResponse(CommandResponseCode.ERROR, "Invalid email address");
         }
 
-        streamingVideo.addUser(new User(pseudo, email));
+        User newUser = new User(pseudo, email);
+        createdUser = newUser;
+        streamingVideo.addUser(newUser);
 
         return new CommandResponse(CommandResponseCode.OK, "Connection successful");
     }
@@ -70,5 +78,9 @@ public class ConnectCommand extends Command {
         if (email == null)
             return false;
         return pat.matcher(email).matches();
+    }
+
+    public User getCreatedUser() {
+        return createdUser;
     }
 }

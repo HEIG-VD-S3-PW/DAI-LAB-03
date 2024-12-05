@@ -28,7 +28,7 @@ public class UploadCommand extends Command {
     }
 
     @Override
-    public CommandResponse execute(User user, StreamingVideo streamingVideo, String[] args) {
+    public CommandResponse execute(StreamingVideo streamingVideo, String[] args) {
         String title = new String(Base64.getDecoder().decode(args[0]), StandardCharsets.UTF_8);
         String description = new String(Base64.getDecoder().decode(args[1]), StandardCharsets.UTF_8);
 

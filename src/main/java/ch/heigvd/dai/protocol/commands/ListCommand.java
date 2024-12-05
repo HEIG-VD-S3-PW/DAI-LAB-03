@@ -19,7 +19,7 @@ public class ListCommand extends Command {
     public void validate(String[] args) throws CommandException {}
 
     @Override
-    public CommandResponse execute(User user, StreamingVideo streamingVideo, String[] args) {
+    public CommandResponse execute(StreamingVideo streamingVideo, String[] args) {
         if (streamingVideo.getVideos().isEmpty())
             return new CommandResponse(CommandResponseCode.ERROR,
                     "No videos available in StreamingVideo");

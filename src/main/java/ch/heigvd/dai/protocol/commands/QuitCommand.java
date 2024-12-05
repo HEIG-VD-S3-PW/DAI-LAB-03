@@ -8,6 +8,8 @@ import ch.heigvd.dai.protocol.CommandResponseCode;
 import ch.heigvd.dai.server.StreamingVideo;
 
 public class QuitCommand extends Command {
+
+
     public QuitCommand() { super("QUIT", "Close connection with the server"); }
 
     @Override
@@ -16,10 +18,9 @@ public class QuitCommand extends Command {
     }
 
     @Override
-    public CommandResponse execute(User user, StreamingVideo streamingVideo, String[] args) {
+    public CommandResponse execute(StreamingVideo streamingVideo, String[] args) {
         try {
-            if (!streamingVideo.suppressUser(user)) return new CommandResponse(CommandResponseCode.NOT_FOUND,
-                                                                    "User not found");
+            // if (!streamingVideo.suppressUser(user)) return new CommandResponse(CommandResponseCode.NOT_FOUND, "User not found");
         } catch (Exception e) {
             return new CommandResponse(CommandResponseCode.ERROR, e.getMessage());
         }

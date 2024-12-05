@@ -23,28 +23,11 @@ public class TCPClient {
             CommandRegistry registry = new CommandRegistry(in, out);
 
 
-
             while(!socket.isClosed()) {
 
                 System.out.print("> ");
                 Scanner sc = new Scanner(System.in);
                 String input = sc.nextLine().trim();
-
-                if (input.equalsIgnoreCase("quit")) {
-                    try {
-                        Command command = registry.getCommand("QUIT");
-                        if (command != null) {
-                            out.write("QUIT\n");
-                            out.flush();
-                            command.receive();
-                        } else {
-                            System.out.println("✗ Erreur: Commande QUIT non trouvée dans le registre");
-                        }
-                    } catch (Exception e) {
-                        System.out.println("Erreur durant la déconnexion :" + e.getMessage());
-                    }
-                    break;
-                }
 
                 if (input.equalsIgnoreCase("connect")) {
                     try {
@@ -62,7 +45,7 @@ public class TCPClient {
                     continue;
                 }
 
-                if (input.equalsIgnoreCase("upload")) {
+                if (input.equalsIgnoreCase("upload") || input.toLowerCase().startsWith("upload ")) {
                     try {
                         UploadProcess uploadProcess = new UploadProcess(in, out);
                         uploadProcess.execute();

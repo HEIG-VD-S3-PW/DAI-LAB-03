@@ -43,8 +43,7 @@ public class TCPServer {
                  BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))
             ){
 
-                CommandRegistry registry = new CommandRegistry(in, out);
-                ServerCommandHandler protocolHandler = new ServerCommandHandler(registry, in, out, null, streamingVideo);
+                ServerCommandHandler protocolHandler = new ServerCommandHandler(in, out, streamingVideo);
 
                 while(!clientSocket.isClosed()){
 

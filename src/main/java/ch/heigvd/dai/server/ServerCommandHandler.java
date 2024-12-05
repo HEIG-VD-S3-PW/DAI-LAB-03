@@ -5,6 +5,7 @@ import ch.heigvd.dai.protocol.Command;
 import ch.heigvd.dai.protocol.CommandRegistry;
 import ch.heigvd.dai.protocol.CommandResponse;
 import ch.heigvd.dai.protocol.CommandResponseCode;
+import ch.heigvd.dai.protocol.commands.ConnectCommand;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -14,15 +15,17 @@ public class ServerCommandHandler {
     private final CommandRegistry registry;
     private final BufferedReader in;
     private final BufferedWriter out;
-    private final User user;
     private final StreamingVideo streamingVideo;
 
-    public ServerCommandHandler(CommandRegistry registry, BufferedReader in, BufferedWriter out, User user, StreamingVideo streamingVideo) {
-        this.registry = registry;
+    private User user;
+
+    public ServerCommandHandler(BufferedReader in, BufferedWriter out, StreamingVideo streamingVideo) {
         this.in = in;
         this.out = out;
-        this.user = user;
         this.streamingVideo = streamingVideo;
+
+        this.registry = new CommandRegistry(in, out);
+        this.user = null;
     }
 
     public void handleLine(String line) throws IOException {
@@ -37,12 +40,22 @@ public class ServerCommandHandler {
             return;
         }
 
+        if(user == null && !(command instanceof ConnectCommand)){
+            sendResponse(new CommandResponse(CommandResponseCode.ERROR, "Vous devez vous connecter pour effectuer cette action"));
+            return;
+        }
+
         try {
+
             // Validation des arguments
             command.validate(args);
 
             // Exécution
-            CommandResponse response = command.execute(user, streamingVideo, args);
+            CommandResponse response = command.execute(streamingVideo, args);
+
+            if(command instanceof ConnectCommand connectCommand && user == null){
+                setUser(connectCommand.getCreatedUser());
+            }
 
             // Envoi de la réponse
             if (response != null){
@@ -57,5 +70,9 @@ public class ServerCommandHandler {
     private void sendResponse(CommandResponse response) throws IOException {
         out.write(response.getCode() + " " + response.getMessage() + "\n");
         out.flush();
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

@@ -1,6 +1,7 @@
 package ch.heigvd.dai.protocol;
 
 import ch.heigvd.dai.protocol.commands.*;
+import ch.heigvd.dai.server.ServerCommandHandler;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

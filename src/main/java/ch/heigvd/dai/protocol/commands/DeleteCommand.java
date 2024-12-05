@@ -20,7 +20,7 @@ public class DeleteCommand extends Command {
     }
 
     @Override
-    public CommandResponse execute(User user, StreamingVideo streamingVideo, String[] args) {
+    public CommandResponse execute(StreamingVideo streamingVideo, String[] args) {
         String videoChoice = args[0];
         if (!streamingVideo.checkValidity(videoChoice)) {
             return new CommandResponse(CommandResponseCode.NOT_FOUND, "Video not found");
