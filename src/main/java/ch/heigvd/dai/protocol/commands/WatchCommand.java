@@ -7,6 +7,7 @@ import ch.heigvd.dai.protocol.CommandException;
 import ch.heigvd.dai.protocol.CommandResponse;
 import ch.heigvd.dai.protocol.CommandResponseCode;
 import ch.heigvd.dai.server.StreamingVideo;
+import ch.heigvd.dai.utils.Utils;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -51,12 +52,10 @@ public class WatchCommand extends Command {
                                     java.util.Arrays.copyOf(buffer, bytesRead) :
                                     buffer
                     );
-                    out.write(encodedChunk + "\n");
-                    out.flush();
+                    Utils.send(out, encodedChunk);
                 }
                 // Envoyer un marqueur de fin
-                out.write(END_MARKER + "\n");
-                out.flush();
+                Utils.send(out, END_MARKER);
             }
 
             return null;

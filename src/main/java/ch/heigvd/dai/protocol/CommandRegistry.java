@@ -36,4 +36,8 @@ public class CommandRegistry {
     public Command getCommand(String name) {
         return commands.get(name.toUpperCase());
     }
+
+    public Map<String, Command> getCommands() {
+        return commands;
+    }
 }

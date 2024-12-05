@@ -7,6 +7,7 @@ import ch.heigvd.dai.protocol.CommandResponse;
 import ch.heigvd.dai.protocol.CommandResponseCode;
 import ch.heigvd.dai.protocol.commands.ConnectCommand;
 import ch.heigvd.dai.protocol.commands.QuitCommand;
+import ch.heigvd.dai.utils.Utils;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -78,8 +79,7 @@ public class ServerCommandHandler {
     }
 
     private void sendResponse(CommandResponse response) throws IOException {
-        out.write(response.getCode() + " " + response.getMessage() + "\n");
-        out.flush();
+        Utils.send(out, response.getCode() + " " + response.getMessage());
     }
 
     public void setUser(User user) {

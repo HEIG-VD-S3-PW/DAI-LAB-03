@@ -39,12 +39,7 @@ public class Client implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        try{
-            TCPClient client = new TCPClient(host, port);
-        }
-        catch(IOException e){
-            System.err.println("Couldn't create a TCP connexion on the client side :" + e.getMessage());
-        }
+        TCPClient client = new TCPClient(host, port);
         return 1;
     }
 }

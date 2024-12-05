@@ -17,8 +17,7 @@ public class SignInClientProcess extends Process {
         String pseudo = Utils.askForInput("Enter your pseudo: ", null);
         String email = Utils.askForInput("Enter your email: ", Utils::emailValidation);
 
-        out.write("CONNECT" + " " + pseudo + " " + email + "\n");
-        out.flush();
+        Utils.send(out, "SIGNIN " + pseudo + " " + email);
 
         return true;
 

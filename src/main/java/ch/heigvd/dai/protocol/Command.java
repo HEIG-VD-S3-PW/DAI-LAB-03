@@ -3,6 +3,7 @@ package ch.heigvd.dai.protocol;
 import ch.heigvd.dai.objects.User;
 import ch.heigvd.dai.server.ServerCommandHandler;
 import ch.heigvd.dai.server.StreamingVideo;
+import ch.heigvd.dai.utils.Utils;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -30,30 +31,8 @@ public abstract class Command {
         out.flush();
     }
 
-    protected CommandResponse readResponse() throws IOException {
-        String responseLine = in.readLine();
-        if (responseLine == null) {
-            throw new IOException("Connexion fermée");
-        }
-
-        String[] parts = responseLine.split(" ", 2);
-        int code = Integer.parseInt(parts[0]);
-        String message = parts.length > 1 ? parts[1] : "";
-
-        // Convertir le code numérique en CommandResponseCode
-        CommandResponseCode responseCode = null;
-        for (CommandResponseCode c : CommandResponseCode.values()) {
-            if (c.getCode() == code) {
-                responseCode = c;
-                break;
-            }
-        }
-
-        if (responseCode == null) {
-            throw new IOException("Code de réponse invalide: " + code);
-        }
-
-        return new CommandResponse(responseCode, message);
+    public CommandResponse readResponse() throws IOException {
+        return Utils.readResponse(in);
     }
 
     public abstract void validate(String[] args) throws CommandException;
