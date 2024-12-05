@@ -1,5 +1,7 @@
 package ch.heigvd.dai;
 
+import java.util.Objects;
+
 public class User {
     private String username;
     private String email;
@@ -9,9 +11,7 @@ public class User {
         this.email = email;
     }
 
-    public boolean compare(User u1, User u2) {
-       return u1.getUsername().equals(u2.getUsername()) && u1.getEmail().equals(u2.getEmail());
-    }
+    public boolean equals(User u) { return Objects.equals(username, u.username) && Objects.equals(email, u.email); }
 
     public String getUsername(){
         return username;
