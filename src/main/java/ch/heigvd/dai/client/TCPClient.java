@@ -31,6 +31,18 @@ public class TCPClient {
                 String input = sc.nextLine().trim();
 
                 if (input.equalsIgnoreCase("quit")) {
+                    try {
+                        Command command = registry.getCommand("QUIT");
+                        if (command != null) {
+                            out.write("QUIT");
+                            out.flush();
+                            command.receive();
+                        } else {
+                            System.out.println("✗ Erreur: Commande QUIT non trouvée dans le registre");
+                        }
+                    } catch (Exception e) {
+                        System.out.println("Erreur durant la déconnexion :" + e.getMessage());
+                    }
                     break;
                 }
 
