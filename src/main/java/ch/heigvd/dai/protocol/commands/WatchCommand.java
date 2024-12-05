@@ -59,7 +59,7 @@ public class WatchCommand extends Command {
                 out.flush();
             }
 
-            return new CommandResponse(CommandResponseCode.OK, "Video stream completed");
+            return null;
         } catch (IOException e) {
             return new CommandResponse(CommandResponseCode.ERROR, "Error streaming video: " + e.getMessage());
         }
@@ -68,7 +68,7 @@ public class WatchCommand extends Command {
     @Override
     public void receive() {
         File tempFile = null;
-        Process vlcProcess = null;
+        Process process = null;
 
         try {
             CommandResponse response = readResponse();
@@ -100,20 +100,29 @@ public class WatchCommand extends Command {
                 System.out.println("\nDownload complete!");
             }
 
-            // Lancer VLC
-            ProcessBuilder vlcBuilder = new ProcessBuilder("vlc", tempFile.getAbsolutePath());
-            vlcProcess = vlcBuilder.start();
-            vlcProcess.waitFor();
+            String absolutePath = tempFile.getAbsolutePath();
+            String os = System.getProperty("os.name").toLowerCase();
+            ProcessBuilder processBuilder;
 
-            // Lire la réponse finale
-            response = readResponse();
-            System.out.println(response.getMessage());
+            if (os.contains("win")) {
+                processBuilder = new ProcessBuilder("cmd", "/c", "start", absolutePath);
+            } else if (os.contains("mac")) {
+                processBuilder = new ProcessBuilder("open", absolutePath);
+            } else {
+                processBuilder = new ProcessBuilder("xdg-open", absolutePath);
+            }
+
+            process = processBuilder.start();
+
+            // Attendre un peu pour laisser le temps au lecteur de démarrer
+            Thread.sleep(2000);
+
 
         } catch (Exception e) {
             System.err.println("Error while watching video: " + e.getMessage());
         } finally {
-            if (vlcProcess != null) {
-                vlcProcess.destroy();
+            if (process != null) {
+                process.destroy();
             }
             if (tempFile != null && tempFile.exists()) {
                 try {
