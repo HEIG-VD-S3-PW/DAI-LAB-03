@@ -34,7 +34,7 @@ public class TCPClient {
                     try {
                         Command command = registry.getCommand("QUIT");
                         if (command != null) {
-                            out.write("QUIT");
+                            out.write("QUIT\n");
                             out.flush();
                             command.receive();
                         } else {
