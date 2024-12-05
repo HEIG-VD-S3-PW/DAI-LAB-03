@@ -26,7 +26,7 @@ import picocli.CommandLine;
 public class Client implements Callable<Integer> {
 
     @CommandLine.Option(
-            names = {"-H", "--host"},
+            names = {"-h", "--host"},
             description = "Host to connect to.",
             required = true)
     protected String host;
