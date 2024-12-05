@@ -23,6 +23,15 @@ public class QuitCommand extends Command {
 
     @Override
     public void receive() {
-
+        try {
+            CommandResponse response = readResponse();
+            if(response.getCode() != 200){
+               System.err.println("Error while quitting service: " + response.getMessage());
+               return;
+            }
+            System.out.println(response.getMessage());
+        } catch (Exception e) {
+            System.err.println("Error while quitting services: " + e.getMessage());
+        }
     }
 }
