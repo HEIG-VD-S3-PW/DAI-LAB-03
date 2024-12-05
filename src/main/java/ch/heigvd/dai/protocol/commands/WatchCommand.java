@@ -10,10 +10,12 @@ import ch.heigvd.dai.server.StreamingVideo;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Base64;
 
 public class WatchCommand extends Command {
+    private static final int BUFFER_SIZE = 8192;
+    private static final String END_MARKER = "END_OF_STREAM";
+
     public WatchCommand() {
         super("WATCH", "Watch a video");
     }
@@ -33,34 +35,31 @@ public class WatchCommand extends Command {
         }
 
         Video video = streamingVideo.getVideo(videoChoice);
+        File videoFile = new File(video.getURL());
 
         try {
-            // sendResponse(new CommandResponse(200, "Starting video stream: " + video.getTitle()));
+            // Envoyer la taille du fichier
+            sendResponse(new CommandResponse(CommandResponseCode.OK, String.valueOf(videoFile.length())));
 
-            try (FileInputStream fis = new FileInputStream(video.getURL())) {
-
-                byte[] buffer = new byte[8192]; // Lecture par chunk de 8 Ko
+            // Envoyer le fichier en chunks encodés en Base64
+            try (FileInputStream fis = new FileInputStream(videoFile)) {
+                byte[] buffer = new byte[BUFFER_SIZE];
                 int bytesRead;
-
                 while ((bytesRead = fis.read(buffer)) != -1) {
-
-                    // Si on n'a pas lu un buffer complet, on crée un nouveau tableau de la bonne taille
-                    byte[] toEncode = buffer;
-                    if (bytesRead != buffer.length) {
-                        toEncode = new byte[bytesRead];
-                        System.arraycopy(buffer, 0, toEncode, 0, bytesRead);
-                    }
-
-                    String chunk = Base64.getEncoder().encodeToString(toEncode);
-                    out.write(chunk + "\n");
+                    String encodedChunk = Base64.getEncoder().encodeToString(
+                            bytesRead < buffer.length ?
+                                    java.util.Arrays.copyOf(buffer, bytesRead) :
+                                    buffer
+                    );
+                    out.write(encodedChunk + "\n");
                     out.flush();
                 }
-
-                out.write("END_OF_DOWNLOAD\n");
+                // Envoyer un marqueur de fin
+                out.write(END_MARKER + "\n");
                 out.flush();
             }
 
-            return new CommandResponse(CommandResponseCode.OK, "Video stream completed");
+            return null;
         } catch (IOException e) {
             return new CommandResponse(CommandResponseCode.ERROR, "Error streaming video: " + e.getMessage());
         }
@@ -69,56 +68,69 @@ public class WatchCommand extends Command {
     @Override
     public void receive() {
         File tempFile = null;
-        Process vlcProcess = null;
+        Process process = null;
 
         try {
-
-            CommandResponse initialResponse = readResponse();
-            if (initialResponse.getCode() != 200) {
-                System.out.println(initialResponse.getMessage());
+            CommandResponse response = readResponse();
+            if (response.getCode() != 200) {
+                System.out.println(response.getMessage());
                 return;
             }
 
+            long fileSize = Long.parseLong(response.getMessage());
             tempFile = File.createTempFile("video_", ".mp4");
             tempFile.deleteOnExit();
 
-
+            // Recevoir le fichier
             try (FileOutputStream fos = new FileOutputStream(tempFile)) {
                 String line;
+                long totalReceived = 0;
+
                 while ((line = in.readLine()) != null) {
-                    if (line.equals("END_OF_DOWNLOAD")) {
+                    if (line.equals(END_MARKER)) {
                         break;
                     }
+
                     byte[] chunk = Base64.getDecoder().decode(line);
                     fos.write(chunk);
+                    totalReceived += chunk.length;
+
+                    System.out.printf("\rDownloading: %.1f%%", (totalReceived * 100.0) / fileSize);
                 }
-                fos.flush();
+                System.out.println("\nDownload complete!");
             }
 
-            ProcessBuilder vlcBuilder = new ProcessBuilder("vlc", tempFile.getAbsolutePath());
-            vlcProcess = vlcBuilder.start();
-            vlcProcess.waitFor();
+            String absolutePath = tempFile.getAbsolutePath();
+            String os = System.getProperty("os.name").toLowerCase();
+            ProcessBuilder processBuilder;
 
-            CommandResponse finalResponse = readResponse();
-            System.out.println(finalResponse.getMessage());
+            if (os.contains("win")) {
+                processBuilder = new ProcessBuilder("cmd", "/c", "start", absolutePath);
+            } else if (os.contains("mac")) {
+                processBuilder = new ProcessBuilder("open", absolutePath);
+            } else {
+                processBuilder = new ProcessBuilder("xdg-open", absolutePath);
+            }
+
+            process = processBuilder.start();
+
+            // Attendre un peu pour laisser le temps au lecteur de démarrer
+            Thread.sleep(2000);
+
 
         } catch (Exception e) {
             System.err.println("Error while watching video: " + e.getMessage());
-
         } finally {
-            if (vlcProcess != null) {
-                vlcProcess.destroy();
+            if (process != null) {
+                process.destroy();
             }
-
-            if (tempFile != null) {
+            if (tempFile != null && tempFile.exists()) {
                 try {
-                    Files.deleteIfExists(tempFile.toPath());
-                    System.out.println("Temporary file deleted");
+                    Files.delete(tempFile.toPath());
                 } catch (IOException e) {
-                    System.err.println("Error while deleting temporary file: " + e.getMessage());
+                    System.err.println("Error deleting temp file: " + e.getMessage());
                 }
             }
         }
-
     }
 }

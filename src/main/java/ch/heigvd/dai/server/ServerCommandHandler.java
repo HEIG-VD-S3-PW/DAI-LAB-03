@@ -45,7 +45,9 @@ public class ServerCommandHandler {
             CommandResponse response = command.execute(user, streamingVideo, args);
 
             // Envoi de la réponse
-            sendResponse(response);
+            if (response != null){
+                sendResponse(response);
+            }
 
         } catch (Exception e) {
             sendResponse(new CommandResponse(CommandResponseCode.ERROR, "Erreur serveur: " + e.getMessage()));
