@@ -20,8 +20,6 @@ public class Main {
                 new CommandLine(root)
                         .setCommandName(jarFilename)
                         .setCaseInsensitiveEnumValuesAllowed(true)
-                        .setSubcommandsCaseInsensitive(true)
-                        .setOptionsCaseInsensitive(true)
                         .execute(args);
 
         System.exit(exitCode);

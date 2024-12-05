@@ -11,12 +11,14 @@ import java.io.File;
 import ch.heigvd.dai.utils.Utils;
 
 public class StreamingVideo {
+    private List<User> users;
+    private List<Video> videos;
 
-    private final ResourceManager resourceManager;
     public static final String videoPath = System.getProperty("user.dir") + "/videos";
 
     public StreamingVideo(){
-        this.resourceManager = new ResourceManager();
+        users = new ArrayList<>();
+        videos = new ArrayList<>();
         this.load();
     }
 
@@ -74,82 +76,49 @@ public class StreamingVideo {
     }
 
 
-    // Méthodes déléguées au ResourceManager
-    public void addUser(User user) {
-        resourceManager.addUser(user);
+    public void addUser(User user){
+        users.add(user);
     }
 
     public void removeUser(User user) {
-        resourceManager.removeUser(user);
+        users.remove(user);
     }
 
-    public void addVideo(Video video) {
-        resourceManager.addVideo(video);
+    public void addVideo(Video video){
+        videos.add(video);
     }
 
     public List<User> getUsers() {
-        return resourceManager.getUsers();
+        return users;
     }
 
     public List<Video> getVideos() {
-        return resourceManager.getVideos();
+        return videos;
     }
 
-    // Méthodes pour la gestion de la concurrence
-    public boolean canWatchVideo(String videoTitle) {
-        return resourceManager.startWatchingVideo(videoTitle);
-    }
-
-    public void finishWatchingVideo(String videoTitle) {
-        resourceManager.stopWatchingVideo(videoTitle);
-    }
-
-    public boolean canDeleteVideo(String videoTitle) {
-        return resourceManager.canDeleteVideo(videoTitle);
-    }
-
-    // Nouvelle méthode de suppression qui gère aussi le fichier physique
-    public void deleteVideo(Video video) {
-        // On vérifie d'abord si on peut supprimer la vidéo
-        if (canDeleteVideo(video.getTitle())) {
-            // On supprime d'abord de la gestion des ressources
-            resourceManager.deleteVideo(video.getTitle());
-
-            // Puis on supprime le fichier physique
-            try {
-                File videoFile = new File(video.getURL());
-                if (!videoFile.delete()) {
-                    System.err.println("Warning: Could not delete physical file: " + video.getURL());
-                }
-            } catch (SecurityException e) {
-                System.err.println("Security error while deleting file: " + e.getMessage());
-            } catch (Exception e) {
-                System.err.println("Unexpected error while deleting file: " + e.getMessage());
-            }
-        }
-    }
-
-    public boolean userExists(String pseudo, String email) {
-        for (User user : getUsers()) {
-            if (user.getUsername().equalsIgnoreCase(pseudo) ||
-                    user.getEmail().equalsIgnoreCase(email)) {
+    public boolean userExists(String pseudo, String email){
+        for(User user : users){
+            if(user.getUsername().equalsIgnoreCase(pseudo) || user.getEmail().equalsIgnoreCase(email)){
                 return true;
             }
         }
         return false;
     }
 
-    public boolean isValidChoice(String videoChoice) {
-        try {
-            int index = Integer.parseInt(videoChoice);
-            return index > 0 && index <= getVideos().size();
-        } catch (NumberFormatException e) {
+    public boolean checkValidity(String videoChoice){
+
+        int index = 0;
+        try{
+            index = Integer.parseInt(videoChoice);
+        } catch(NumberFormatException e){
             return false;
         }
+
+        return (index > 0 && index <= videos.size());
     }
 
     public Video getVideo(String videoChoice) {
         int index = Integer.parseInt(videoChoice);
-        return getVideos().get(index - 1);
+        return videos.get(index - 1);
     }
 }

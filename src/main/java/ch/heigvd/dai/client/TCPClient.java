@@ -6,7 +6,6 @@ import ch.heigvd.dai.process.UploadProcess;
 import ch.heigvd.dai.protocol.Command;
 import ch.heigvd.dai.protocol.CommandRegistry;
 import ch.heigvd.dai.protocol.commands.QuitCommand;
-import ch.heigvd.dai.utils.Utils;
 
 import java.io.*;
 import java.net.Socket;
@@ -40,7 +39,8 @@ public class TCPClient {
                     continue;
                 }
 
-                Utils.send(out, input);
+                out.write(input + "\n");
+                out.flush();
                 command.receive();
 
                 if (command instanceof QuitCommand) break;

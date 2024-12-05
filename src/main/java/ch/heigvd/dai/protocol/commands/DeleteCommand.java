@@ -1,7 +1,6 @@
 package ch.heigvd.dai.protocol.commands;
 
 import ch.heigvd.dai.objects.User;
-import ch.heigvd.dai.objects.Video;
 import ch.heigvd.dai.protocol.Command;
 import ch.heigvd.dai.protocol.CommandException;
 import ch.heigvd.dai.protocol.CommandResponse;
@@ -25,18 +24,11 @@ public class DeleteCommand extends Command {
 
         String videoChoice = args[0];
 
-        if (!streamingVideo.isValidChoice(videoChoice)) {
+        if (!streamingVideo.checkValidity(videoChoice)) {
             return new CommandResponse(CommandResponseCode.NOT_FOUND, "Video not found");
         }
 
-        Video video = streamingVideo.getVideo(videoChoice);
-
-        if (!streamingVideo.canDeleteVideo(video.getTitle())) {
-            return new CommandResponse(CommandResponseCode.FORBIDDEN,
-                    "Video is currently being watched by other users");
-        }
-
-        streamingVideo.deleteVideo(video);
+        streamingVideo.getVideos().remove(Integer.parseInt(videoChoice) - 1);
 
         return new CommandResponse(CommandResponseCode.OK, "Video deleted");
     }
