@@ -139,14 +139,13 @@ public class StreamingVideo {
         return false;
     }
 
-    public boolean checkValidity(String videoChoice) {
-        int index = 0;
+    public boolean isValidChoice(String videoChoice) {
         try {
-            index = Integer.parseInt(videoChoice);
+            int index = Integer.parseInt(videoChoice);
+            return index > 0 && index <= getVideos().size();
         } catch (NumberFormatException e) {
             return false;
         }
-        return (index > 0 && index <= getVideos().size());
     }
 
     public Video getVideo(String videoChoice) {

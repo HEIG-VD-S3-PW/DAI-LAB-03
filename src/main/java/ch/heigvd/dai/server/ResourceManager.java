@@ -7,11 +7,10 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ResourceManager {
-    // CopyOnWriteArrayList pour les accès concurrents aux listes
+
     private final CopyOnWriteArrayList<User> users;
     private final CopyOnWriteArrayList<Video> videos;
 
-    // Map pour suivre les vidéos en cours de lecture
     private final ConcurrentHashMap<String, Integer> activeViewers;
 
     public ResourceManager() {

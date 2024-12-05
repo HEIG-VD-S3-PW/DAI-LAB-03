@@ -25,7 +25,7 @@ public class DeleteCommand extends Command {
 
         String videoChoice = args[0];
 
-        if (!streamingVideo.checkValidity(videoChoice)) {
+        if (!streamingVideo.isValidChoice(videoChoice)) {
             return new CommandResponse(CommandResponseCode.NOT_FOUND, "Video not found");
         }
 
