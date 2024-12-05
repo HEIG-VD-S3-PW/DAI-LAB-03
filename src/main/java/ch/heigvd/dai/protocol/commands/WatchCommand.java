@@ -33,11 +33,17 @@ public class WatchCommand extends Command {
 
         String videoChoice = args[0];
 
-        if (!streamingVideo.checkValidity(videoChoice)) {
+        if (!streamingVideo.isValidChoice(videoChoice)) {
             return new CommandResponse(CommandResponseCode.NOT_FOUND, "Video not found");
         }
 
         Video video = streamingVideo.getVideo(videoChoice);
+
+        if (!streamingVideo.canWatchVideo(video.getTitle())) {
+            return new CommandResponse(CommandResponseCode.FORBIDDEN,
+                    "Video is currently being deleted or is unavailable");
+        }
+
         File videoFile = new File(video.getURL());
 
         try {
@@ -64,6 +70,9 @@ public class WatchCommand extends Command {
 
         } catch (IOException e) {
             return new CommandResponse(CommandResponseCode.ERROR, "Error streaming video: " + e.getMessage());
+
+        }finally {
+            streamingVideo.finishWatchingVideo(video.getTitle());
         }
     }
 
