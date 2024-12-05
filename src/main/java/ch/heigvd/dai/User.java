@@ -11,8 +11,6 @@ public class User {
         this.email = email;
     }
 
-    public boolean equals(User u) { return Objects.equals(username, u.username) && Objects.equals(email, u.email); }
-
     public String getUsername(){
         return username;
     }
