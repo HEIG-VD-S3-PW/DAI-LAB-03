@@ -54,7 +54,7 @@ public class TCPServer {
                         continue;
                     }
 
-                    System.out.println("RECEIVED: " + line);
+                    System.out.println("Command received: " + line);
                     protocolHandler.handleLine(line);
 
                 }

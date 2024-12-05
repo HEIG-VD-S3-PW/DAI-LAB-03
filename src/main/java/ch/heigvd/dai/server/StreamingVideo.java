@@ -74,14 +74,6 @@ public class StreamingVideo {
         return videos;
     }
 
-    public String videosToString(){
-        String result = "\nChoose a video from this list:\n";
-        int counter = 0;
-        for(Video video : videos){
-            result += counter++ + ": " + video.toString() + "\n";
-        }
-        return result;
-    }
 
     /**
      * Check if the video choice is valid
