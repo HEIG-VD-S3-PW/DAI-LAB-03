@@ -15,6 +15,7 @@ import picocli.CommandLine;
                 "LIST          Show all videos from the server",
                 "WATCH <id>    Watch a specific video by using it's number",
                 "UPLOAD        Upload a new video",
+                "QUIT          Close the connection with the server"
         },
         footer = "\nCredits: Tristan Baud, Arno Tribolet and Mathieu Emery",
         headerHeading = "\n=== Client Command ===\n\n",    // Adds a header for better separation

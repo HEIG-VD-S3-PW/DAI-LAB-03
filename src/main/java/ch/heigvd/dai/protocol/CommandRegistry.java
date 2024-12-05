@@ -24,6 +24,7 @@ public class CommandRegistry {
         registerCommand(new DeleteCommand());
         registerCommand(new ConnectCommand());
         registerCommand(new UploadCommand());
+        registerCommand(new QuitCommand());
     }
 
     public void registerCommand(Command command) {

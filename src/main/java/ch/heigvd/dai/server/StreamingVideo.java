@@ -62,6 +62,10 @@ public class StreamingVideo {
         users.add(user);
     }
 
+    public boolean suppressUser(User user) {
+        return users.remove(user);
+    }
+
     public void addVideo(Video video){
         videos.add(video);
     }

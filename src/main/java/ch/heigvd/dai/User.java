@@ -1,5 +1,7 @@
 package ch.heigvd.dai;
 
+import java.util.Objects;
+
 public class User {
     private String username;
     private String email;
