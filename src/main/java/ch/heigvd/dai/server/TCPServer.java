@@ -16,7 +16,7 @@ public class TCPServer {
     private static final int NUMBER_OF_THREADS = 10;
 
     public static void main(String[] args) throws IOException {
-        try (ServerSocket serverSocket = new ServerSocket(port);
+        try (ServerSocket serverSocket = new ServerSocket(port, NUMBER_OF_THREADS, InetAddress.getByName("0.0.0.0"));
              ExecutorService executor = Executors.newFixedThreadPool(NUMBER_OF_THREADS)) {
 
             System.out.println("Server listening for connections on port: " + port);

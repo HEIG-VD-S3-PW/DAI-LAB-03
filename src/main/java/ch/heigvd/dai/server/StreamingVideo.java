@@ -27,6 +27,7 @@ public class StreamingVideo {
         File directory = new File(videoPath);
         File[] videoFiles = directory.listFiles();
 
+
         if (videoFiles == null) {
             System.err.println("Error : the video directory is unreachable : " + videoPath);
             return;
