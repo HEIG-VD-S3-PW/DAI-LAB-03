@@ -33,7 +33,7 @@ public class QuitCommand extends Command {
             System.out.println(response.getMessage());
 
         } catch (Exception e) {
-            System.err.println("Error while quitting : " + e.getMessage());
+            System.err.println("Error while reading response: " + e.getMessage());
         }
     }
 }

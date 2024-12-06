@@ -2,7 +2,7 @@
 
 ### Version 1.0.0
 
-A command-line utility to select videos on a remote server so you can then watch them. The application allows you to easily connect yourself remotely to the server, help you choose a video and then plays it for you with your system-default video player.
+A command-line utility to select videos on a remote server so you can then download them. The application allows you to easily connect yourself remotely to the server, help you choose a video and then plays it for you with your system-default video player.
 
 ## Table of Contents
 - [Features](#features)
@@ -18,7 +18,7 @@ A command-line utility to select videos on a remote server so you can then watch
 ---
 
 ## Features
-- **TCP connection**: TCP to interact with the server (connect, upload, delete, list, watch).
+- **TCP connection**: TCP to interact with the server (connect, upload, delete, list, download).
 - **Multithreading**: The server can manage up to 10 (by default) remote connections at the same time.
 - **Secure authentication**: Secure management of user entry with regexes.
 - **User-friendly CLI**: Easy to use with clear options and commands.
@@ -60,7 +60,7 @@ target/DAI-LAB-03-1.0-SNAPSHOT.jar
 
 ## Usage
 
-The application is a CLI tool that help you choose videos to watch. You need to identify yourself first before choosing between the available videos.
+The application is a CLI tool that help you choose videos to download. You need to identify yourself first before choosing between the available videos.
 Available Commands
 
     client: Start the client connection to the server.
@@ -93,7 +93,7 @@ Output:
 ```vbnet
 ======= Amar Streaming Platform =======
 
-Watch, add and remove videos from/to a remote server
+Download, upload and remove videos from/to a remote server
 
 Usage: DAI-LAB-03-1.0-SNAPSHOT.jar [-hV] [COMMAND]
 
@@ -126,10 +126,10 @@ Description:
 Start the client to connect to the streaming server.
 
 Once connected the following commands are available:
-DELETE <id>   Delete a video that you select with it's number.
-LIST          Show all videos from the server
-WATCH <id>    Watch a specific video by using it's number
-UPLOAD        Upload a new video
+DELETE <id>     Delete a video that you select with it's number.
+LIST            Show all videos from the server
+DOWNLOAD <id>   Download a specific video by using it's number
+UPLOAD          Upload a new video
 
 Options:
   -H, --host=<host>   Host to connect to.
@@ -154,7 +154,7 @@ Start the server to accept remote connections
 
 Options:
   -p, --port=<port>   Port to use (default: 1986).
-    -c, --clients=<clients>   Maximum number of clients to accept (default: 10).
+  -c, --clients=<clients>   Maximum number of clients to accept (default: 10).
 
 Credits: Tristan Baud, Arno Tribolet and Mathieu Emery
 
@@ -212,7 +212,7 @@ After that, the CONNECT command ask for the connection and, if it is accepted, t
 
 - DELETE <id> : Delete the video with the <id> number 
 - LIST: List all videos on the server
-- WATCH <id> : Watch the video with the <id> number 
+- DOWNLOAD <id> : Download the video with the <id> number 
 - UPLOAD: Upload a video
 
 Example with the command LIST:

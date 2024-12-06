@@ -21,7 +21,7 @@ public class ConnectCommand extends Command {
     @Override
     public void validate(String[] args) throws CommandException {
         if (args.length != 2) {
-            throw new CommandException("The delete command expects exactly one argument");
+            throw new CommandException("The connect command expects exactly two arguments (CONNECT <pseudo> <email>)");
         }
     }
 
@@ -57,7 +57,7 @@ public class ConnectCommand extends Command {
             System.out.println(response.getMessage());
 
         } catch (Exception e) {
-            System.err.println("Error while connecting the user: " + e.getMessage());
+            System.err.println("Error while reading response: " + e.getMessage());
         }
     }
 

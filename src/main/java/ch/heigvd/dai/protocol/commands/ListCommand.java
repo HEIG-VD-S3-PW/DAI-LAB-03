@@ -22,8 +22,10 @@ public class ListCommand extends Command {
 
     @Override
     public CommandResponse execute(User user, StreamingVideo streamingVideo, String[] args) {
-        if (streamingVideo.getVideos().isEmpty())
-            return new CommandResponse(CommandResponseCode.ERROR, "No videos available in StreamingVideo");
+
+        if(streamingVideo.getVideos().isEmpty()){
+            return new CommandResponse(CommandResponseCode.NOT_FOUND, "No videos found");
+        }
 
         StringBuilder response = new StringBuilder();
         for(int i = 0; i < streamingVideo.getVideos().size(); i++){
@@ -63,9 +65,7 @@ public class ListCommand extends Command {
 
 
         } catch (IOException e) {
-
-            System.err.println("Error while listing videos: " + e.getMessage());
-
+            System.err.println("Error while reading response: " + e.getMessage());
         }
     }
 }

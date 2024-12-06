@@ -16,7 +16,7 @@ public class DeleteCommand extends Command {
     @Override
     public void validate(String[] args) throws CommandException {
         if (args.length != 1) {
-            throw new CommandException("The delete command expects exactly one argument");
+            throw new CommandException("The delete command expects exactly one argument (DELETE <videoChoice>)");
         }
     }
 
@@ -32,8 +32,7 @@ public class DeleteCommand extends Command {
         Video video = streamingVideo.getVideo(videoChoice);
 
         if (!streamingVideo.canDeleteVideo(video.getTitle())) {
-            return new CommandResponse(CommandResponseCode.FORBIDDEN,
-                    "Video is currently being watched by other users");
+            return new CommandResponse(CommandResponseCode.FORBIDDEN, "Video is currently being downloaded by other users");
         }
 
         streamingVideo.deleteVideo(video);
@@ -49,7 +48,7 @@ public class DeleteCommand extends Command {
             System.out.println(response.getMessage());
 
         } catch (Exception e) {
-            System.err.println("Error while deleting video: " + e.getMessage());
+            System.err.println("Error while reading response: " + e.getMessage());
         }
     }
 }

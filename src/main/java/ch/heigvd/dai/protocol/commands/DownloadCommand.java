@@ -23,7 +23,7 @@ public class DownloadCommand extends Command {
     @Override
     public void validate(String[] args) throws CommandException {
         if (args.length != 1) {
-            throw new CommandException("The download command expects exactly one argument");
+            throw new CommandException("The download command expects exactly one argument (DOWNLOAD <videoChoice>)");
         }
     }
 
@@ -33,12 +33,12 @@ public class DownloadCommand extends Command {
         String videoChoice = args[0];
 
         if (!streamingVideo.isValidChoice(videoChoice)) {
-            return new CommandResponse(CommandResponseCode.NOT_FOUND, "Video not found");
+            return new CommandResponse(CommandResponseCode.NOT_FOUND, "Invalid/unknown video choice");
         }
 
         Video video = streamingVideo.getVideo(videoChoice);
 
-        if (!streamingVideo.canWatchVideo(video.getTitle())) {
+        if (!streamingVideo.canDownloadVideo(video.getTitle())) {
             return new CommandResponse(CommandResponseCode.FORBIDDEN, "Video is currently being deleted or is unavailable");
         }
 
@@ -67,10 +67,10 @@ public class DownloadCommand extends Command {
             return null;
 
         } catch (IOException e) {
-            return new CommandResponse(CommandResponseCode.ERROR, "Error streaming video: " + e.getMessage());
+            return new CommandResponse(CommandResponseCode.ERROR, "Error while downloading video: " + e.getMessage());
 
         }finally {
-            streamingVideo.finishWatchingVideo(video.getTitle());
+            streamingVideo.finishDownloadingVideo(video.getTitle());
         }
     }
 
@@ -110,7 +110,7 @@ public class DownloadCommand extends Command {
             }
 
         } catch (Exception e) {
-            System.err.println("Error while watching video: " + e.getMessage());
+            System.err.println("Error while reading response: " + e.getMessage());
         }
     }
 
