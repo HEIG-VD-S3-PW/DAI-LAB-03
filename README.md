@@ -170,7 +170,7 @@ Server listening for connections on port: 1986
 To create a client connection on the remote server so you can identify yourself:
 
 ```bash
-java -jar target/DAI-LAB-03-1.0-SNAPSHOT.jar client -H localhost
+java -jar target/DAI-LAB-03-1.0-SNAPSHOT.jar Client -H localhost
 ```
 
 Output:
