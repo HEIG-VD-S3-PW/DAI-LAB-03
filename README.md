@@ -9,7 +9,8 @@ A command-line utility to select videos on a remote server so you can then watch
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Usage](#usage)
-    - [Examples](#examples)
+    - [Examples without Docker](#examples-without-docker)
+    - [Examples with Docker](#examples-with-docker)
     - [Command Summary](#command-summary)
 - [Building from Source](#building-from-source)
 - [Credits](#credits)
@@ -159,7 +160,7 @@ Credits: Tristan Baud, Arno Tribolet and Mathieu Emery
 
 ```
 
-## Examples
+## Examples without Docker
 ### Starting the server connection
 
 To start the server and make him listen for incoming connections :
@@ -225,6 +226,40 @@ Example with the command LIST:
 5) Why is Switzerland home to so many billionaires - Documentary on Switzerland's billionaires
 >
 ```
+
+## Examples with Docker
+
+You can also use Docker to run the application. First, create the Docker image and the network:
+
+```bash
+docker build -t ammar-app .
+docker network create ammar-net
+```
+
+Then, start the server and the client in two different terminals:
+
+```bash
+docker run -p 1986:1986 -v ./server_data:/app/server_data \
+  --network ammar-net --name ammar-server ammar-app Server
+```
+
+```bash
+docker run -it -v ./client_data:/app/client_data \
+  --network ammar-net ammar-app Client --host ammar-server --port 1986
+```
+
+Be sure to have the folders `server_data` and `client_data` in the same directory as the Dockerfile.
+
+### Cleaning up
+
+After you are done, you can stop and remove the containers and the network:
+
+```bash
+docker stop ammar-server
+docker rm ammar-server
+docker network rm ammar-net
+```
+
 
 ---
 

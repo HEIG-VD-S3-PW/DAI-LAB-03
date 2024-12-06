@@ -13,7 +13,6 @@ import ch.heigvd.dai.utils.Utils;
 public class StreamingVideo {
 
     private final ResourceManager resourceManager;
-    public static final String videoPath = System.getProperty("user.dir") + "/videos";
 
     public StreamingVideo(){
         this.resourceManager = new ResourceManager();
@@ -22,12 +21,12 @@ public class StreamingVideo {
 
 
     public void load() {
-        File directory = new File(videoPath);
+        File directory = new File(Utils.SERVER_VIDEO_PATH);
         File[] videoFiles = directory.listFiles();
 
 
         if (videoFiles == null) {
-            System.err.println("Error : the video directory is unreachable : " + videoPath);
+            System.err.println("Error : the video directory is unreachable : " + Utils.SERVER_VIDEO_PATH);
             return;
         }
 
