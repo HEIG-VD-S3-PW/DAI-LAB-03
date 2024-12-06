@@ -14,8 +14,8 @@ import java.nio.file.Files;
 import java.util.Base64;
 
 public class WatchCommand extends Command {
+
     private static final int BUFFER_SIZE = 8192;
-    private static final String END_MARKER = "END_OF_STREAM";
 
     public WatchCommand() {
         super("WATCH", "Watch a video");
@@ -40,8 +40,7 @@ public class WatchCommand extends Command {
         Video video = streamingVideo.getVideo(videoChoice);
 
         if (!streamingVideo.canWatchVideo(video.getTitle())) {
-            return new CommandResponse(CommandResponseCode.FORBIDDEN,
-                    "Video is currently being deleted or is unavailable");
+            return new CommandResponse(CommandResponseCode.FORBIDDEN, "Video is currently being deleted or is unavailable");
         }
 
         File videoFile = new File(video.getURL());
@@ -49,7 +48,7 @@ public class WatchCommand extends Command {
         try {
 
             // Send the file size
-            sendResponse(new CommandResponse(CommandResponseCode.OK, String.valueOf(videoFile.length())));
+            sendResponse(new CommandResponse(CommandResponseCode.OK, "Let's start streaming!"));
 
             try (FileInputStream fis = new FileInputStream(videoFile)) {
                 byte[] buffer = new byte[BUFFER_SIZE];
@@ -63,7 +62,7 @@ public class WatchCommand extends Command {
                     Utils.send(out, encodedChunk);
                 }
 
-                Utils.send(out, END_MARKER);
+                Utils.send(out, Utils.DOWNLOAD_DELIMITER);
             }
 
             return null;
@@ -91,27 +90,23 @@ public class WatchCommand extends Command {
                 return;
             }
 
-            long fileSize = Long.parseLong(response.getMessage());
             tempFile = File.createTempFile("video_", ".mp4");
             tempFile.deleteOnExit();
 
             try (FileOutputStream fos = new FileOutputStream(tempFile)) {
 
                 String line;
-                long totalReceived = 0;
 
                 while ((line = in.readLine()) != null) {
-                    if (line.equals(END_MARKER)) {
+                    if (line.equals(Utils.DOWNLOAD_DELIMITER)) {
                         break;
                     }
 
                     byte[] chunk = Base64.getDecoder().decode(line);
                     fos.write(chunk);
-                    totalReceived += chunk.length;
-
-                    System.out.printf("\rDownloading: %.1f%%", (totalReceived * 100.0) / fileSize);
                 }
-                System.out.println("\nDownload complete!");
+
+                System.out.println("Download complete !");
 
             }
 

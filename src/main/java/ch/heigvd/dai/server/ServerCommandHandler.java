@@ -14,6 +14,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 public class ServerCommandHandler {
+
     private final CommandRegistry registry;
     private final BufferedReader in;
     private final BufferedWriter out;
@@ -30,6 +31,13 @@ public class ServerCommandHandler {
         this.user = null;
     }
 
+    /**
+     * Handle a line received from the client
+     *
+     * @param line The line received
+     * @return True if the client wants to quit, false otherwise
+     * @throws IOException
+     */
     public boolean handleLine(String line) throws IOException {
 
         String[] parts = line.split(" ", 2);
@@ -42,7 +50,7 @@ public class ServerCommandHandler {
             return false;
         }
 
-        if(user == null && !(command instanceof ConnectCommand) && !(command instanceof QuitCommand)){
+        if(user == null && !(command instanceof ConnectCommand || command instanceof QuitCommand)){
             sendResponse(new CommandResponse(CommandResponseCode.ERROR, "You have to be connected to execute this command"));
             return false;
         }
@@ -75,6 +83,12 @@ public class ServerCommandHandler {
         return false;
     }
 
+    /**
+     * Send a response to the client
+     *
+     * @param response The response to send
+     * @throws IOException
+     */
     private void sendResponse(CommandResponse response) throws IOException {
         Utils.send(out, response.getCode() + " " + response.getMessage());
     }

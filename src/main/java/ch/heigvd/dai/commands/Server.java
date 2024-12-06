@@ -23,12 +23,18 @@ public class Server implements Callable<Integer> {
             defaultValue = "1986")
     protected int port;
 
+    @CommandLine.Option(
+            names = {"-t", "--threads"},
+            description = "Number of clients simultaneously connected (default: ${DEFAULT-VALUE}).",
+            defaultValue = "10")
+    protected int threads;
+
     @Override
     public Integer call() {
         try{
-            TCPServer.main(new String[]{"-p", String.valueOf(port)});
-        }
-        catch(Exception e){
+            TCPServer server = new TCPServer(port, threads);
+            server.run();
+        } catch(Exception e){
             System.err.println("Couldn't create a TCP connexion on the server side :" + e.getMessage());
         }
 

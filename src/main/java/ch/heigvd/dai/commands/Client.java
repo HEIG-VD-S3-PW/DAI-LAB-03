@@ -40,6 +40,7 @@ public class Client implements Callable<Integer> {
     @Override
     public Integer call() {
         TCPClient client = new TCPClient(host, port);
+        client.run();
         return 1;
     }
 }

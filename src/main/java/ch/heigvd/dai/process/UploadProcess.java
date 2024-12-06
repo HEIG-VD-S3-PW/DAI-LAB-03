@@ -10,8 +10,8 @@ import java.util.Base64;
 import java.util.Scanner;
 
 public class UploadProcess extends Process {
+
     private static final int BUFFER_SIZE = 8192;
-    private static final String END_MARKER = "END_OF_STREAM";
 
     public UploadProcess(BufferedReader in, BufferedWriter out) {
         super(in, out);
@@ -38,14 +38,10 @@ public class UploadProcess extends Process {
         }
         System.out.println(response.getMessage());
 
-        Utils.send(out, videoFile.length());
 
         try (FileInputStream fis = new FileInputStream(videoFile)) {
             byte[] buffer = new byte[BUFFER_SIZE];
             int bytesRead;
-            long totalSent = 0;
-            long fileSize = videoFile.length();
-
             while ((bytesRead = fis.read(buffer)) != -1) {
                 String encodedChunk = Base64.getEncoder().encodeToString(
                         bytesRead < buffer.length ?
@@ -53,12 +49,9 @@ public class UploadProcess extends Process {
                                 buffer
                 );
                 Utils.send(out, encodedChunk);
-
-                totalSent += bytesRead;
-                System.out.printf("\rUploading: %.1f%%", (totalSent * 100.0) / fileSize);
             }
 
-            Utils.send(out, END_MARKER);
+            Utils.send(out, Utils.UPLOAD_DELIMITER);
 
             System.out.println("\nUpload complete! Waiting for server confirmation...");
 

@@ -11,22 +11,30 @@ import java.util.concurrent.Executors;
 
 public class TCPServer {
 
-    private static final int port = 1986;
-    private static final StreamingVideo streamingVideo = new StreamingVideo();
-    private static final int NUMBER_OF_THREADS = 10;
+    private final int PORT;
+    private final StreamingVideo streamingVideo;
+    private final int NUMBER_OF_THREADS;
 
-    public static void main(String[] args) throws IOException {
-        try (ServerSocket serverSocket = new ServerSocket(port, NUMBER_OF_THREADS, InetAddress.getByName("0.0.0.0"));
+    public TCPServer(int port, int numberOfThreads) {
+        this.PORT = port;
+        this.NUMBER_OF_THREADS = numberOfThreads;
+
+        this.streamingVideo = new StreamingVideo();
+
+    }
+
+    public void run() throws IOException {
+        try (ServerSocket serverSocket = new ServerSocket(PORT);
              ExecutorService executor = Executors.newFixedThreadPool(NUMBER_OF_THREADS)) {
 
-            System.out.println("Server listening for connections on port: " + port);
+            System.out.println("Server listening for connections on port: " + PORT);
 
             while (!serverSocket.isClosed()) {
                 Socket clientSocket = serverSocket.accept();
 
                 System.out.println("New client connected: " + clientSocket.getInetAddress().getHostAddress());
 
-                executor.submit(new ClientHandler(clientSocket));
+                executor.submit(new ClientHandler(clientSocket, streamingVideo));
             }
         } catch (IOException e) {
             System.out.println("[Server] exception: " + e);
@@ -35,9 +43,11 @@ public class TCPServer {
 
     private static class ClientHandler implements Runnable {
         private final Socket clientSocket;
+        private final StreamingVideo streamingVideo;
 
-        public ClientHandler(Socket socket) {
+        public ClientHandler(Socket socket, StreamingVideo streamingVideo) {
             this.clientSocket = socket;
+            this.streamingVideo = streamingVideo;
         }
 
         public void run() {
@@ -47,7 +57,7 @@ public class TCPServer {
                  BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))
             ){
 
-                ServerCommandHandler protocolHandler = new ServerCommandHandler(in, out, streamingVideo);
+                ServerCommandHandler protocolHandler = new ServerCommandHandler(in, out, this.streamingVideo);
 
                 while(!clientSocket.isClosed()){
 

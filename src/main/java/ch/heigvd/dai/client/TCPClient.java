@@ -13,9 +13,18 @@ import java.net.Socket;
 import java.util.Scanner;
 
 public class TCPClient {
+
+    private final String HOST;
+    private final int PORT;
+
     public TCPClient(String host, int port) {
+        this.HOST = host;
+        this.PORT = port;
+    }
+
+    public void run(){
         try (
-                Socket socket = new Socket(host, port);
+                Socket socket = new Socket(HOST, PORT);
                 BufferedWriter out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
                 BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 Scanner scanner = new Scanner(System.in)
@@ -50,6 +59,15 @@ public class TCPClient {
         }
     }
 
+    /**
+     * Handle special commands on the client side
+     *
+     * @param input    The input string
+     * @param in       The input stream
+     * @param out      The output stream
+     * @param registry The command registry
+     * @return True if the command was handled, false otherwise
+     */
     private boolean handleSpecialCommand(String input, BufferedReader in, BufferedWriter out, CommandRegistry registry) {
         try {
             if (input.equalsIgnoreCase("connect")) {
@@ -67,6 +85,14 @@ public class TCPClient {
         }
     }
 
+    /**
+     * Execute a process and receive the command
+     *
+     * @param process
+     * @param commandName
+     * @param registry
+     * @throws Exception
+     */
     private void executeProcess(Process process, String commandName, CommandRegistry registry) throws Exception {
         if (!process.execute()) return;
         Command command = registry.getCommand(commandName);

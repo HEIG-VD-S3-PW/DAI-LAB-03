@@ -14,6 +14,8 @@ import java.util.regex.Pattern;
 public class Utils {
 
     private final static String DELIMITER = "\n";
+    public final static String UPLOAD_DELIMITER = "END_OF_UPLOAD";
+    public final static String DOWNLOAD_DELIMITER = "END_OF_DOWNLOAD";
 
     public static boolean emailValidation(String email){
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\."+
