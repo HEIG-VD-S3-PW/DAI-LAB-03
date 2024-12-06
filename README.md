@@ -2,7 +2,7 @@
 
 ### Version 1.0.0
 
-A command-line utility to select videos on a remote server so you can then watch them. The application allows you to easily connect yourself remotely to the server, help you choose a video and then plays it for you in VLC.
+A command-line utility to select videos on a remote server so you can then watch them. The application allows you to easily connect yourself remotely to the server, help you choose a video and then plays it for you with your system-default video player.
 
 ## Table of Contents
 - [Features](#features)
@@ -17,17 +17,18 @@ A command-line utility to select videos on a remote server so you can then watch
 ---
 
 ## Features
-- **TCP and UDP connection**: TCP to login and choose the video, UDP to receive the video data.
-- **Multithreading**: The server can manage up to 10 remote connections at the same time.
+- **TCP connection**: TCP to interact with the server (connect, upload, delete, list, watch).
+- **Multithreading**: The server can manage up to 10 (by default) remote connections at the same time.
 - **Secure authentication**: Secure management of user entry with regexes.
 - **User-friendly CLI**: Easy to use with clear options and commands.
+- **Thread-safe**: The server and its resources are thread-safe and can manage multiple clients at the same time.
 
 ---
 
 ## Requirements
 - **Java**: You need to have Java 21 installed.
 - **Maven**: Ensure you have Maven installed to manage dependencies and build the project.
-
+- 
 ---
 
 ## Installation
@@ -64,12 +65,19 @@ Available Commands
     client: Start the client connection to the server.
     server: Start the server.
 
-Options
+Shared options
 
-    -H, --host: Host to connect to (For the client connection).
     -p, --port: Port to use (default: 1986).
     -h, --help: Displays the help for the application and exit.
     -V, --version: Prints version information and exit.
+
+Server option
+
+    -c, --clients: Maximum number of clients to accept (default: 10).
+
+Client option
+
+    -H, --host: Host to connect to (For the client connection).
 
 Help Command
 
@@ -145,6 +153,7 @@ Start the server to accept remote connections
 
 Options:
   -p, --port=<port>   Port to use (default: 1986).
+    -c, --clients=<clients>   Maximum number of clients to accept (default: 10).
 
 Credits: Tristan Baud, Arno Tribolet and Mathieu Emery
 
@@ -228,6 +237,7 @@ Example with the command LIST:
 | -p, --port    | 	Port to use (Default: 1986)                     |
 | -h, --help    | 	Show help message and exit.                     |
 | -V, --version | 	Print version information and exit.             |
+| -c, --clients | 	Maximum number of clients to accept (Default: 10)|
 
 ---
 
@@ -263,9 +273,43 @@ mvn test
 
 ---
 
+## Adding new commands
+
+To add a new command, you need to create a new class that extends the Command class and implement the validate, execute and receive commands. You can then add the command to the CommandRegistry class.
+
+```java
+@Override
+public void validate(String[] args) throws CommandException {
+    // Check the arguments and throw an exception if they are invalid
+}
+
+@Override
+public CommandResponse execute(User user, StreamingVideo streamingVideo, String[] args) {
+    // SERVER SIDE : Execute the command and return a response to the client
+}
+
+@Override
+public void receive() {
+    // CLIENT SIDE : Receive the response from the server
+}
+```
+
+```java
+public CommandRegistry(BufferedReader in, BufferedWriter out) {
+    // ...
+  registerCommand(new NewCommand());
+}
+```
+
+Now your command is available to use in the application.
+
+__Moreover, if you choose to contribute to the project by adding a new command, you have to create diagrams to explain the new command, how it works, and the interactions between the client and the server.__
+
+---
+
 ## Credits
 
-This project was developed by Tristan Baud ([NATSIIRT](https://github.com/NATSIIRT)), Arno Tribolet (([arnoheigvd](https://github.com/arnoheigvd)), and Mathieu Emery ([mathieuemery](https://github.com/mathieuemery))as part of a DAI (Development of internet applications) lab project.
+This project was developed by Tristan Baud ([NATSIIRT](https://github.com/NATSIIRT)), Arno Tribolet (([arnoheigvd](https://github.com/arnoheigvd)), and Mathieu Emery ([mathieuemery](https://github.com/mathieuemery)) as part of a DAI (Development of internet applications) lab project.
 
 
 ---

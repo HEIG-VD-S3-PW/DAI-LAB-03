@@ -7,14 +7,14 @@ import ch.heigvd.dai.protocol.CommandException;
 import ch.heigvd.dai.protocol.CommandResponse;
 import ch.heigvd.dai.protocol.CommandResponseCode;
 import ch.heigvd.dai.server.StreamingVideo;
+import ch.heigvd.dai.utils.Utils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 public class UploadCommand extends Command {
-    private static final int BUFFER_SIZE = 8192;
-    private static final String END_MARKER = "END_OF_STREAM";
+
 
     public UploadCommand() {
         super("UPLOAD", "Upload video");
@@ -38,37 +38,36 @@ public class UploadCommand extends Command {
         }
 
         try {
+
             sendResponse(new CommandResponse(CommandResponseCode.OK, "Ready to receive video"));
+
         }catch (IOException e){
+
             return new CommandResponse(CommandResponseCode.ERROR, "Error while uploading video: " + e.getMessage());
+
         }
 
+        System.out.println("Receiving video...");
+        System.out.println("Title: " + title);
+        System.out.println("Description: " + description);
 
-        System.out.println("Receiving video: " + title + " with description: " + description);
         String fullFileName = streamingVideo.encodeVideoName(title, description);
 
         try {
 
-            String sizeLine = in.readLine();
-            long fileSize = Long.parseLong(sizeLine);
-            System.out.println("Expected file size: " + fileSize + " bytes");
-
             try (FileOutputStream fos = new FileOutputStream("videos/" + fullFileName)) {
                 String line;
-                long totalReceived = 0;
 
                 while ((line = in.readLine()) != null) {
-                    if (line.equals(END_MARKER)) {
+                    if (line.equals(Utils.UPLOAD_DELIMITER)) {
                         break;
                     }
 
                     byte[] chunk = Base64.getDecoder().decode(line);
                     fos.write(chunk);
-                    totalReceived += chunk.length;
 
-                    System.out.printf("\rReceiving: %.1f%%", (totalReceived * 100.0) / fileSize);
                 }
-                System.out.println("\nUpload complete!");
+                System.out.println("Upload complete !");
             }
 
             streamingVideo.addVideo(new Video(title, description, fullFileName));

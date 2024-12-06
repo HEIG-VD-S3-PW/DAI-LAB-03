@@ -26,7 +26,7 @@ import picocli.CommandLine;
 public class Client implements Callable<Integer> {
 
     @CommandLine.Option(
-            names = {"-h", "--host"},
+            names = {"-H", "--host"},
             description = "Host to connect to.",
             required = true)
     protected String host;
@@ -40,6 +40,7 @@ public class Client implements Callable<Integer> {
     @Override
     public Integer call() {
         TCPClient client = new TCPClient(host, port);
+        client.run();
         return 1;
     }
 }

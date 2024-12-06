@@ -6,6 +6,9 @@ import ch.heigvd.dai.objects.Video;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * This class is responsible for managing the resources of the server (thread-safe).
+ */
 public class ResourceManager {
 
     private final CopyOnWriteArrayList<User> users;

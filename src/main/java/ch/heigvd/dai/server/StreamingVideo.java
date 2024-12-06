@@ -75,7 +75,8 @@ public class StreamingVideo {
     }
 
 
-    // Méthodes déléguées au ResourceManager
+    // Methods concurrency safe
+
     public void addUser(User user) {
         resourceManager.addUser(user);
     }
@@ -96,7 +97,6 @@ public class StreamingVideo {
         return resourceManager.getVideos();
     }
 
-    // Méthodes pour la gestion de la concurrence
     public boolean canWatchVideo(String videoTitle) {
         return resourceManager.startWatchingVideo(videoTitle);
     }
@@ -109,27 +109,43 @@ public class StreamingVideo {
         return resourceManager.canDeleteVideo(videoTitle);
     }
 
-    // Nouvelle méthode de suppression qui gère aussi le fichier physique
+
+    /**
+     * Delete a video from the server
+     *
+     * @param video the video to delete
+     */
     public void deleteVideo(Video video) {
-        // On vérifie d'abord si on peut supprimer la vidéo
+        // Check if the video can be deleted (no active viewers)
         if (canDeleteVideo(video.getTitle())) {
-            // On supprime d'abord de la gestion des ressources
             resourceManager.deleteVideo(video.getTitle());
 
-            // Puis on supprime le fichier physique
             try {
+
                 File videoFile = new File(video.getURL());
                 if (!videoFile.delete()) {
                     System.err.println("Warning: Could not delete physical file: " + video.getURL());
                 }
+
             } catch (SecurityException e) {
+
                 System.err.println("Security error while deleting file: " + e.getMessage());
+
             } catch (Exception e) {
+
                 System.err.println("Unexpected error while deleting file: " + e.getMessage());
+
             }
         }
     }
 
+    /**
+     * Check if a user already exists
+     *
+     * @param pseudo the pseudo of the user
+     * @param email the email of the user
+     * @return true if the user already exists, false otherwise
+     */
     public boolean userExists(String pseudo, String email) {
         for (User user : getUsers()) {
             if (user.getUsername().equalsIgnoreCase(pseudo) ||
@@ -140,6 +156,12 @@ public class StreamingVideo {
         return false;
     }
 
+    /**
+     * Check if the video choice is valid
+     *
+     * @param videoChoice the video choice
+     * @return true if the choice is valid, false otherwise
+     */
     public boolean isValidChoice(String videoChoice) {
         try {
             int index = Integer.parseInt(videoChoice);
@@ -149,6 +171,12 @@ public class StreamingVideo {
         }
     }
 
+    /**
+     * Get the video corresponding to the choice (String)
+     *
+     * @param videoChoice the video choice
+     * @return the video corresponding to the choice
+     */
     public Video getVideo(String videoChoice) {
         int index = Integer.parseInt(videoChoice);
         return getVideos().get(index - 1);
