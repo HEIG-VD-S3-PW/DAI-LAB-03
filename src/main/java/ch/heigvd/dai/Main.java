@@ -21,7 +21,6 @@ public class Main {
                         .setCommandName(jarFilename)
                         .setCaseInsensitiveEnumValuesAllowed(true)
                         .setSubcommandsCaseInsensitive(true)
-                        .setOptionsCaseInsensitive(true)
                         .execute(args);
 
         System.exit(exitCode);

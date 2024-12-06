@@ -22,16 +22,18 @@ public class TCPClient {
         this.PORT = port;
     }
 
+    /**
+     * Run the client
+     */
     public void run(){
-        try (
-                Socket socket = new Socket(HOST, PORT);
-                BufferedWriter out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                Scanner scanner = new Scanner(System.in)
-        ) {
+        try (Socket socket = new Socket(HOST, PORT);
+             BufferedWriter out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+             Scanner scanner = new Scanner(System.in)) {
+
             CommandRegistry registry = new CommandRegistry(in, out);
 
-            System.out.print("COMMANDS AVAILABLE: ");
+            System.out.print("COMMANDS: ");
             registry.getCommands().forEach((k, v) -> System.out.print(k + " "));
             System.out.println();
 

@@ -18,12 +18,13 @@ public class TCPServer {
     public TCPServer(int port, int numberOfThreads) {
         this.PORT = port;
         this.NUMBER_OF_THREADS = numberOfThreads;
-
         this.streamingVideo = new StreamingVideo();
-
     }
 
-    public void run() throws IOException {
+    /**
+     * Run the server
+     */
+    public void run() {
         try (ServerSocket serverSocket = new ServerSocket(PORT);
              ExecutorService executor = Executors.newFixedThreadPool(NUMBER_OF_THREADS)) {
 
@@ -53,7 +54,7 @@ public class TCPServer {
         public void run() {
 
             try (clientSocket;
-                    BufferedWriter out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
+                 BufferedWriter out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
                  BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))
             ){
 

@@ -53,7 +53,7 @@ public class UploadProcess extends Process {
 
             Utils.send(out, Utils.UPLOAD_DELIMITER);
 
-            System.out.println("\nUpload complete! Waiting for server confirmation...");
+            System.out.println("Upload complete! Waiting for server confirmation...");
 
         }catch (IOException e){
             System.err.println("Error while uploading video: " + e.getMessage());

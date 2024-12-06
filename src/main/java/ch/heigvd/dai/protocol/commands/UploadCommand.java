@@ -38,11 +38,14 @@ public class UploadCommand extends Command {
         }
 
         try {
-            sendResponse(new CommandResponse(CommandResponseCode.OK, "Ready to receive video"));
-        }catch (IOException e){
-            return new CommandResponse(CommandResponseCode.ERROR, "Error while uploading video: " + e.getMessage());
-        }
 
+            sendResponse(new CommandResponse(CommandResponseCode.OK, "Ready to receive video"));
+
+        }catch (IOException e){
+
+            return new CommandResponse(CommandResponseCode.ERROR, "Error while uploading video: " + e.getMessage());
+
+        }
 
         System.out.println("Receiving video...");
         System.out.println("Title: " + title);

@@ -36,8 +36,10 @@ public abstract class Command {
 
     public abstract void validate(String[] args) throws CommandException;
 
+    // Server side execution
     public abstract CommandResponse execute(User user, StreamingVideo streamingVideo, String[] args);
 
+    // Client side execution
     public abstract void receive();
 
 }

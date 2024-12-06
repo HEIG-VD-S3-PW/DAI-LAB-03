@@ -24,7 +24,7 @@ public class Server implements Callable<Integer> {
     protected int port;
 
     @CommandLine.Option(
-            names = {"-t", "--threads"},
+            names = {"-c", "--clients"},
             description = "Number of clients simultaneously connected (default: ${DEFAULT-VALUE}).",
             defaultValue = "10")
     protected int threads;
