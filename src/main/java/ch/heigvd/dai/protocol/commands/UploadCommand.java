@@ -55,7 +55,7 @@ public class UploadCommand extends Command {
 
         try {
 
-            try (FileOutputStream fos = new FileOutputStream("videos/" + fullFileName)) {
+            try (FileOutputStream fos = new FileOutputStream(Utils.SERVER_VIDEO_PATH + "/" + fullFileName)) {
                 String line;
 
                 while ((line = in.readLine()) != null) {

@@ -23,7 +23,7 @@ public class UploadProcess extends Process {
         String description = Utils.askForInput("Enter the description of the video: ", null);
         String path = Utils.askForInput("Enter the path of the video file: ", null);
 
-        File videoFile = validateFile(path);
+        File videoFile = validateFile(Utils.CLIENT_DATA_PATH + "/" + path);
 
         String encodedTitle = Base64.getEncoder().encodeToString(title.getBytes());
         String encodedDesc = Base64.getEncoder().encodeToString(description.getBytes());

@@ -6,7 +6,6 @@ import ch.heigvd.dai.protocol.CommandResponseCode;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Objects;
 import java.util.Scanner;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -16,6 +15,9 @@ public class Utils {
     private final static String DELIMITER = "\n";
     public final static String UPLOAD_DELIMITER = "END_OF_UPLOAD";
     public final static String DOWNLOAD_DELIMITER = "END_OF_DOWNLOAD";
+
+    public static final String SERVER_VIDEO_PATH = System.getProperty("user.dir") + "/server_data";
+    public static final String CLIENT_DATA_PATH = System.getProperty("user.dir") + "/client_data";
 
     public static boolean emailValidation(String email){
         String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\."+
