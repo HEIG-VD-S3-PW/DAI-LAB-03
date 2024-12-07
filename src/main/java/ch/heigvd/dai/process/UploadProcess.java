@@ -1,80 +1,68 @@
-
-
 package ch.heigvd.dai.process;
 
+import ch.heigvd.dai.protocol.Command;
+import ch.heigvd.dai.protocol.CommandResponse;
+import ch.heigvd.dai.protocol.CommandResponseCode;
+import ch.heigvd.dai.utils.Utils;
+
 import java.io.*;
-import java.security.MessageDigest;
 import java.util.Base64;
 import java.util.Scanner;
 
 public class UploadProcess extends Process {
-    private final Scanner scanner;
-    private static final int CHUNK_SIZE = 8192;
-    private static final int TIMEOUT_SECONDS = 30;
+
+    private static final int BUFFER_SIZE = 8192;
 
     public UploadProcess(BufferedReader in, BufferedWriter out) {
         super(in, out);
-        scanner = new Scanner(System.in);
     }
 
     @Override
-    public void execute() throws Exception {
-        String title = getValidInput("Enter the title of the video: ");
-        String description = getValidInput("Enter the description of the video: ");
-        String path = getValidInput("Enter the path of the video: ");
+    public boolean execute() throws Exception {
+        String title = Utils.askForInput("Enter the title of the video: ", null);
+        String description = Utils.askForInput("Enter the description of the video: ", null);
+        String path = Utils.askForInput("Enter the path of the video file: ", null);
 
-        File videoFile = validateFile(path);
+        File videoFile = validateFile(Utils.CLIENT_DATA_PATH + "/" + path);
 
-        title = Base64.getEncoder().encodeToString(title.getBytes());
-        description = Base64.getEncoder().encodeToString(description.getBytes());
+        String encodedTitle = Base64.getEncoder().encodeToString(title.getBytes());
+        String encodedDesc = Base64.getEncoder().encodeToString(description.getBytes());
 
-        // Envoi de la commande d'upload
-        out.write("UPLOAD " + title + " " + description + "\n");
-        out.flush();
+        Utils.send(out, "UPLOAD " + encodedTitle + " " + encodedDesc);
+
+        // Wait for server confirmation (to be sure the user is connected)
+        CommandResponse response = Utils.readResponse(in);
+        if(response.getCode() != CommandResponseCode.OK.getCode()){
+            System.err.println(response.getMessage());
+            return false;
+        }
+        System.out.println(response.getMessage());
+
 
         try (FileInputStream fis = new FileInputStream(videoFile)) {
-            long totalSize = videoFile.length();
-            long uploadedSize = 0;
-            byte[] buffer = new byte[CHUNK_SIZE];
+            byte[] buffer = new byte[BUFFER_SIZE];
             int bytesRead;
-
-            System.out.println("Starting upload of: " + path);
-            System.out.println("Total size: " + (totalSize / 1024 / 1024) + " MB");
-
             while ((bytesRead = fis.read(buffer)) != -1) {
-                byte[] toEncode = buffer;
-                if (bytesRead != buffer.length) {
-                    toEncode = new byte[bytesRead];
-                    System.arraycopy(buffer, 0, toEncode, 0, bytesRead);
-                }
-
-                // Envoi du chunk encodé
-                String chunk = Base64.getEncoder().encodeToString(toEncode);
-                out.write(chunk + "\n");
-                out.flush();
-
-                // Mise à jour de la progression
-                uploadedSize += bytesRead;
-                double progress = (uploadedSize * 100.0) / totalSize;
-                System.out.printf("\rUpload progress: %.2f%%", progress);
+                String encodedChunk = Base64.getEncoder().encodeToString(
+                        bytesRead < buffer.length ?
+                                java.util.Arrays.copyOf(buffer, bytesRead) :
+                                buffer
+                );
+                Utils.send(out, encodedChunk);
             }
 
-            // Envoi du checksum
-            out.write("END_OF_UPLOAD" + "\n");
-            out.flush();
+            Utils.send(out, Utils.UPLOAD_DELIMITER);
 
-            System.out.println("\nUpload completed successfully!");
+            System.out.println("Upload complete! Waiting for server confirmation...");
+
+        }catch (IOException e){
+            System.err.println("Error while uploading video: " + e.getMessage());
+            return false;
         }
+
+        return true;
     }
 
-    private String getValidInput(String prompt) {
-        System.out.print(prompt);
-        String input = scanner.nextLine().trim();
-        if (input.isEmpty()) {
-            throw new IllegalArgumentException("Input cannot be empty");
-        }
-        return input;
-    }
 
     private File validateFile(String path) throws IOException {
         File file = new File(path);
@@ -87,7 +75,9 @@ public class UploadProcess extends Process {
         if (file.length() == 0) {
             throw new IOException("File is empty: " + path);
         }
+        if(!Utils.getFileExtension(file.getName()).equals("mp4")){
+            throw new IOException("Invalid file format: " + path);
+        }
         return file;
     }
 }
-

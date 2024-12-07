@@ -14,6 +14,6 @@ public abstract class Process {
         this.out = out;
     }
 
-    abstract public void execute() throws Exception;
+    abstract public boolean execute() throws Exception;
 }
 

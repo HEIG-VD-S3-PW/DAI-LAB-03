@@ -6,45 +6,59 @@ import ch.heigvd.dai.protocol.CommandRegistry;
 
 import java.net.*;
 import java.io.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class TCPServer {
-    private static final int port = 1986;
-    private static final StreamingVideo streamingVideo = new StreamingVideo();
-    private static final int NUMBER_OF_THREADS = 10;
 
-    public static void main(String[] args) throws IOException {
-        try (ServerSocket serverSocket = new ServerSocket(port); ) {
+    private final int PORT;
+    private final StreamingVideo streamingVideo;
+    private final int NUMBER_OF_THREADS;
+
+    public TCPServer(int port, int numberOfThreads) {
+        this.PORT = port;
+        this.NUMBER_OF_THREADS = numberOfThreads;
+        this.streamingVideo = new StreamingVideo();
+    }
+
+    /**
+     * Run the server
+     */
+    public void run() {
+        try (ServerSocket serverSocket = new ServerSocket(PORT);
+             ExecutorService executor = Executors.newFixedThreadPool(NUMBER_OF_THREADS)) {
+
+            System.out.println("Server listening for connections on port: " + PORT);
+
             while (!serverSocket.isClosed()) {
-                System.out.println("Server listening for connections on port: " + port);
                 Socket clientSocket = serverSocket.accept();
-                Thread clientThread = new Thread(new ClientHandler(clientSocket));
-                clientThread.start();
+
+                System.out.println("New client connected: " + clientSocket.getInetAddress().getHostAddress());
+
+                executor.submit(new ClientHandler(clientSocket, streamingVideo));
             }
         } catch (IOException e) {
             System.out.println("[Server] exception: " + e);
         }
     }
 
-    // ClientHandler class
     private static class ClientHandler implements Runnable {
         private final Socket clientSocket;
+        private final StreamingVideo streamingVideo;
 
-        // Constructor
-        public ClientHandler(Socket socket)
-        {
+        public ClientHandler(Socket socket, StreamingVideo streamingVideo) {
             this.clientSocket = socket;
+            this.streamingVideo = streamingVideo;
         }
 
-        public void run()
-        {
+        public void run() {
 
             try (clientSocket;
-                    BufferedWriter out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
+                 BufferedWriter out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
                  BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))
             ){
 
-                CommandRegistry registry = new CommandRegistry(in, out);
-                ServerCommandHandler protocolHandler = new ServerCommandHandler(registry, in, out, null, streamingVideo);
+                ServerCommandHandler protocolHandler = new ServerCommandHandler(in, out, this.streamingVideo);
 
                 while(!clientSocket.isClosed()){
 
@@ -54,16 +68,15 @@ public class TCPServer {
                         continue;
                     }
 
-                    System.out.println("RECEIVED: " + line);
-                    protocolHandler.handleLine(line);
+                    if(protocolHandler.handleLine(line)){
+                        clientSocket.close();
+                    }
 
                 }
 
             }
-            catch (IOException e) {
-                e.printStackTrace();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+            catch (Exception e) {
+                System.out.println("[ClientHandler] exception: " + e);
             }
         }
     }

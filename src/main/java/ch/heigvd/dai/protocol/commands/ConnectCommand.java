@@ -1,15 +1,19 @@
 package ch.heigvd.dai.protocol.commands;
 
-import ch.heigvd.dai.User;
+import ch.heigvd.dai.objects.User;
 import ch.heigvd.dai.protocol.Command;
 import ch.heigvd.dai.protocol.CommandException;
 import ch.heigvd.dai.protocol.CommandResponse;
 import ch.heigvd.dai.protocol.CommandResponseCode;
 import ch.heigvd.dai.server.StreamingVideo;
 
-import java.util.regex.Pattern;
+import ch.heigvd.dai.utils.Utils;
 
 public class ConnectCommand extends Command {
+
+
+    private User createdUser;
+
     public ConnectCommand() {
         super("CONNECT", "Connect the client with the server");
     }
@@ -30,11 +34,17 @@ public class ConnectCommand extends Command {
             return new CommandResponse(CommandResponseCode.ERROR, "Invalid pseudo");
         }
 
-        if (!emailValidation(email)) {
+        if (!Utils.emailValidation(email)) {
             return new CommandResponse(CommandResponseCode.ERROR, "Invalid email address");
         }
 
-        streamingVideo.addUser(new User(pseudo, email));
+        if(streamingVideo.userExists(pseudo, email)){
+            return new CommandResponse(CommandResponseCode.ERROR, "User already exists");
+        }
+
+        User newUser = new User(pseudo, email);
+        createdUser = newUser;
+        streamingVideo.addUser(newUser);
 
         return new CommandResponse(CommandResponseCode.OK, "Connection successful");
     }
@@ -42,33 +52,16 @@ public class ConnectCommand extends Command {
     @Override
     public void receive() {
         try {
+
             CommandResponse response = readResponse();
-
-            if(response.getCode() != 200){
-                System.err.println("Error while connecting the user: " + response.getMessage());
-                return;
-            }
-
-            System.out.println("Vous êtes connectés !");
+            System.out.println(response.getMessage());
 
         } catch (Exception e) {
             System.err.println("Error while connecting the user: " + e.getMessage());
         }
     }
 
-    /**
-     * Check if the entered email is valid
-     * @param email : Email entered by the user
-     * @return true if valid and false otherwise
-     */
-    private boolean emailValidation(String email){
-        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\."+
-                "[a-zA-Z0-9_+&*-]+)*@" +
-                "(?:[a-zA-Z0-9-]+\\.)+[a-z" +
-                "A-Z]{2,7}$";
-        Pattern pat = Pattern.compile(emailRegex);
-        if (email == null)
-            return false;
-        return pat.matcher(email).matches();
+    public User getCreatedUser() {
+        return createdUser;
     }
 }

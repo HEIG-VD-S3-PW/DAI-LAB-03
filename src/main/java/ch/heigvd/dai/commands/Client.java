@@ -15,6 +15,7 @@ import picocli.CommandLine;
                 "LIST          Show all videos from the server",
                 "WATCH <id>    Watch a specific video by using it's number",
                 "UPLOAD        Upload a new video",
+                "QUIT          Close the connection with the server"
         },
         footer = "\nCredits: Tristan Baud, Arno Tribolet and Mathieu Emery",
         headerHeading = "\n=== Client Command ===\n\n",    // Adds a header for better separation
@@ -38,12 +39,8 @@ public class Client implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        try{
-            TCPClient client = new TCPClient(host, port);
-        }
-        catch(IOException e){
-            System.err.println("Couldn't create a TCP connexion on the client side :" + e.getMessage());
-        }
+        TCPClient client = new TCPClient(host, port);
+        client.run();
         return 1;
     }
 }

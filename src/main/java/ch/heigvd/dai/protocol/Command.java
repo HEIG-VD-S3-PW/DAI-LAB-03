@@ -1,13 +1,13 @@
 package ch.heigvd.dai.protocol;
 
-import ch.heigvd.dai.User;
+import ch.heigvd.dai.objects.User;
+import ch.heigvd.dai.server.ServerCommandHandler;
 import ch.heigvd.dai.server.StreamingVideo;
+import ch.heigvd.dai.utils.Utils;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.stream.Stream;
 
 public abstract class Command {
 
@@ -27,40 +27,19 @@ public abstract class Command {
     }
 
     protected void sendResponse(CommandResponse response) throws IOException {
-        out.write(response.getCode() + " " + response.getMessage() + "\n");
-        out.flush();
+        Utils.send(out, response.getCode() + " " + response.getMessage());
     }
 
-    protected CommandResponse readResponse() throws IOException {
-        String responseLine = in.readLine();
-        if (responseLine == null) {
-            throw new IOException("Connexion fermée");
-        }
-
-        String[] parts = responseLine.split(" ", 2);
-        int code = Integer.parseInt(parts[0]);
-        String message = parts.length > 1 ? parts[1] : "";
-
-        // Convertir le code numérique en CommandResponseCode
-        CommandResponseCode responseCode = null;
-        for (CommandResponseCode c : CommandResponseCode.values()) {
-            if (c.getCode() == code) {
-                responseCode = c;
-                break;
-            }
-        }
-
-        if (responseCode == null) {
-            throw new IOException("Code de réponse invalide: " + code);
-        }
-
-        return new CommandResponse(responseCode, message);
+    public CommandResponse readResponse() throws IOException {
+        return Utils.readResponse(in);
     }
 
     public abstract void validate(String[] args) throws CommandException;
 
+    // Server side execution
     public abstract CommandResponse execute(User user, StreamingVideo streamingVideo, String[] args);
 
+    // Client side execution
     public abstract void receive();
 
 }

@@ -16,4 +16,13 @@ public enum CommandResponseCode {
     public int getCode() {
         return code;
     }
+
+    public static CommandResponseCode fromCode(int code) {
+        for (CommandResponseCode c : CommandResponseCode.values()) {
+            if (c.code == code) {
+                return c;
+            }
+        }
+        return null;
+    }
 }
