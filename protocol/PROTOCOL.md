@@ -45,7 +45,8 @@ Le serveur retourne une confirmation pour que le transfert commence et se termin
 L'utilisateur peut demander à supprimer une vidéo. Le serveur contrôle que la vidéo existe et qu'elle estdisponible pour
 être supprimée. Si c'est le cas, il la supprime. Sinon il retourne une erreur.
 
-Lorsque le client a fini d'utiliser le service, il utilise la commande (QUIT) pour terminer la connexion.
+Lorsque le client a fini d'utiliser le service, il utilise la commande (QUIT) pour terminer la connexion. L'utilisateur 
+est alors supprimé de la liste des utilisateurs et le serveur retourne une confirmation.
 
 ## 3. Messages
 Dans tout les cas, le serveur va répondre avec un code et un message.
@@ -177,8 +178,26 @@ Le client demande au serveur de supprimer une vidéo.
 
 #### Exception
 
-En cas d'exception lors de la suppression, le serveur retournera un code ```500``` (ERROR) suivit du message ```Error while 
-downloading video : <Exception_message>```  
+En cas d'exception lors de la suppression, le serveur retournera un code ```500``` (ERROR) suivit du message ```Server 
+error : <Exception_message>```  
+
+### Suppression d'une vidéo
+
+Le client demande au serveur de supprimer une vidéo.
+
+#### Message
+
+```QUITs```
+
+#### Réponse
+
+- Pour le code ```200``` (OK).
+    - Confirmation de la suppression: ```Video deleted```
+
+#### Exception
+
+En cas d'exception lors de la suppression, le serveur retournera un code ```500``` (ERROR) suivit du message ```Server 
+error: <Exception_message>```
 
 
 ## Examples
