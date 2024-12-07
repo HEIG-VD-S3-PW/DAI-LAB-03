@@ -51,7 +51,7 @@ public class ServerCommandHandler {
         }
 
         if(user == null && !(command instanceof ConnectCommand || command instanceof QuitCommand)){
-            sendResponse(new CommandResponse(CommandResponseCode.ERROR, "You have to be connected to execute this command"));
+            sendResponse(new CommandResponse(CommandResponseCode.UNAUTHORIZED, "You have to be connected to execute this command"));
             return false;
         }
 
