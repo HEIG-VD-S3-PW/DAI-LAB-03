@@ -30,30 +30,27 @@ public class UploadCommand extends Command {
     @Override
     public CommandResponse execute(User user, StreamingVideo streamingVideo, String[] args) {
 
-        String title = new String(Base64.getDecoder().decode(args[0]), StandardCharsets.UTF_8);
-        String description = new String(Base64.getDecoder().decode(args[1]), StandardCharsets.UTF_8);
-
         if(user == null){
-            return new CommandResponse(CommandResponseCode.ERROR, "You must be connected to upload a video");
+            return new CommandResponse(CommandResponseCode.UNAUTHORIZED, "You have to be connected to execute this command");
+        }
+
+        String title;
+        String description;
+        try {
+            title = new String(Base64.getDecoder().decode(args[0]), StandardCharsets.UTF_8);
+            description = new String(Base64.getDecoder().decode(args[1]), StandardCharsets.UTF_8);
+        } catch (IllegalArgumentException e) {
+            return new CommandResponse(CommandResponseCode.ERROR, "Invalid Base64 encoding");
         }
 
         try {
-
             sendResponse(new CommandResponse(CommandResponseCode.OK, "Ready to receive video"));
 
-        }catch (IOException e){
+            System.out.println("Receiving video...");
+            System.out.println("Title: " + title);
+            System.out.println("Description: " + description);
 
-            return new CommandResponse(CommandResponseCode.ERROR, "Error while uploading video: " + e.getMessage());
-
-        }
-
-        System.out.println("Receiving video...");
-        System.out.println("Title: " + title);
-        System.out.println("Description: " + description);
-
-        String fullFileName = streamingVideo.encodeVideoName(title, description);
-
-        try {
+            String fullFileName = streamingVideo.encodeVideoName(title, description);
 
             try (FileOutputStream fos = new FileOutputStream(Utils.SERVER_VIDEO_PATH + "/" + fullFileName)) {
                 String line;
@@ -74,8 +71,7 @@ public class UploadCommand extends Command {
             return new CommandResponse(CommandResponseCode.OK, "Video uploaded successfully");
 
         } catch (Exception e) {
-            System.err.println("Error during upload: " + e.getMessage());
-            return new CommandResponse(CommandResponseCode.ERROR, "Error uploading video: " + e.getMessage());
+            return new CommandResponse(CommandResponseCode.ERROR, "Error while uploading video: " + e.getMessage());
         }
     }
 
@@ -87,7 +83,7 @@ public class UploadCommand extends Command {
             System.out.println(response.getMessage());
 
         } catch (IOException e) {
-            System.err.println("Error while uploading video: " + e.getMessage());
+            System.err.println("Error while reading response: " + e.getMessage());
         }
     }
 }

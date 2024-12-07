@@ -96,12 +96,12 @@ public class StreamingVideo {
         return resourceManager.getVideos();
     }
 
-    public boolean canWatchVideo(String videoTitle) {
-        return resourceManager.startWatchingVideo(videoTitle);
+    public boolean canDownloadVideo(String videoTitle) {
+        return resourceManager.startDownloadingVideo(videoTitle);
     }
 
-    public void finishWatchingVideo(String videoTitle) {
-        resourceManager.stopWatchingVideo(videoTitle);
+    public void finishDownloadingVideo(String videoTitle) {
+        resourceManager.stopDownloadingVideo(videoTitle);
     }
 
     public boolean canDeleteVideo(String videoTitle) {
