@@ -1,14 +1,18 @@
-FROM eclipse-temurin:21-jdk AS builder
-WORKDIR /app
-COPY mvnw pom.xml ./
-COPY .mvn ./.mvn
-RUN chmod +x ./mvnw && ./mvnw install
-COPY src ./src
-RUN ./mvnw package
+# Utilisez l'image officielle OpenJDK comme base
+FROM openjdk:21-jdk-slim
 
-FROM eclipse-temurin:21-jre 
+# Répertoire de travail
 WORKDIR /app
-COPY --from=builder /app/target/DAI-LAB-03-1.0-SNAPSHOT.jar /app/DAI-LAB-03-1.0-SNAPSHOT.jar
-VOLUME ["/app/server_data", "/app/client_data"]
-ENTRYPOINT ["java", "-jar", "/app/DAI-LAB-03-1.0-SNAPSHOT.jar"]
-CMD ["--help"]
+
+# Copie du code compilé (JAR) dans l'image
+COPY target/DAI-LAB-03-1.0-SNAPSHOT.jar /app/DAI-LAB-03-1.0-SNAPSHOT.jar
+
+# Copie des vidéos pour le serveur
+COPY server_data /app/videos
+
+# Exposer le port 1986
+EXPOSE 1986
+
+# Commande par défaut (serveur)
+CMD ["java", "-jar", "/app/DAI-LAB-03-1.0-SNAPSHOT.jar", "server"]
+
