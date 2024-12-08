@@ -6,9 +6,9 @@ import picocli.CommandLine;
         mixinStandardHelpOptions = true,
         name = "Ammar",
         version = "1.0.0",
-        description = "A command-line utility to stream videos from a remote server.",
-        headerHeading = "\n======= Ammar Streaming Platform =======\n\n",  // Ensures header separation
-        header = "Watch, add and remove videos from/to a remote server",
+        description = "A command-line utility to manage videos from a remote server.",
+        headerHeading = "\n======= Ammar Video Platform =======\n\n",  // Ensures header separation
+        header = "Download, upload and remove videos from/to a remote server",
         footer = "\nCredits: Tristan Baud, Arno Tribolet and Mathieu Emery",
         synopsisHeading = "\nUsage: ",
         descriptionHeading = "\nDescription:\n",
