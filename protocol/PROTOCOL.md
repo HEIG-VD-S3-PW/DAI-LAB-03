@@ -7,7 +7,10 @@ un serveur.
 
 ## 2. Transport protocol
 VMA est un protocle client-serveur qui permet le listage, l'ajout, la suppression et le téléchargement de vidéos.  
-VMA utilise le protocole TCP pour ces échanges. Par défaut, le port à utiliser est 1986.
+
+VMA utilise le __protocole TCP__ pour ces échanges. 
+
+Par défaut, le port à utiliser est __1986__.
 
 Les échanges entre client et serveur sont les suivants :
 - Envoie d'une commande et de ses arguments du client au serveur.
@@ -22,7 +25,7 @@ l'exectution de la commande rencontre un problème, le serveur enverra une erreu
 affichera le message.
 
 Si il parvient à se connecter au serveur, le client doit se connecter au service avant de pouvoir envoyer d'autres
-messages. C'est le clients qui initie la connexion. L'utilisation de la commande ```CONNECT``` permet de lancer une
+messages. C'est __le client qui initie la connexion__. L'utilisation de la commande ```CONNECT``` permet de lancer une
 authentification interactive gérée par le client. Celui-ci demande à l'utilisateur et vérifie son username et email. Il
 construit ensuite la commande et l'envoie au serveur.  
 Sinon, il est possbile d'envoyer directement ```CONNECT <Username> <Email>```, la gestion est alors uniquement effectuée
@@ -33,17 +36,18 @@ L'utilisateur peut demander la liste des vidéos. Le serveur lui retourne alors 
 qui sont disponibles. En cas de problème, le serveur retourne une erreur.
 
 L'utilisateur peut demander à télécharger une vidéo. Le serveur retourne une confirmation et commence à envoyer les
-données. Lorsque le client reçoit la confirmation, il commence à receptionner les données. La fin de l'envoie est marquée
+données. Lorsque le client reçoit la confirmation, il commence à receptionner les données. La fin de l'envoi est marqué
 par son délimiteur.
 
 L'utilisateur peut demander à ajouter une vidéo au server. L'utilisation de la commande UPLOAD permet de lancer un
 interface interactif pour le parametrage de l'upload gérée par le client. Celui-ci demande à l'utilisateur et vérifie le
 titre, la description et le chemin de la video. Il construit ensuite la commande et l'envoie au serveur.  
-Le serveur retourne une confirmation pour que le transfert commence et se termine avec le délimiteur.
+Le serveur retourne une confirmation pour que le transfert commence. À la fin du transfert, le client envoie le délimiteur
+défini et le serveur retourne une confirmation.
 
 
-L'utilisateur peut demander à supprimer une vidéo. Le serveur contrôle que la vidéo existe et qu'elle estdisponible pour
-être supprimée. Si c'est le cas, il la supprime. Sinon il retourne une erreur.
+L'utilisateur peut demander à supprimer une vidéo. Le serveur contrôle que la vidéo existe et qu'elle est disponible pour
+être supprimée. Si c'est le cas, il la supprime. Sinon il retourne une erreur. Il ne doit pas être possible de supprimer une vidéo en cours de téléchargement par un autre utilisateur.
 
 Lorsque le client a fini d'utiliser le service, il utilise la commande (QUIT) pour terminer la connexion. L'utilisateur 
 est alors supprimé de la liste des utilisateurs et le serveur retourne une confirmation.
@@ -113,7 +117,6 @@ Le flux est considéré comme terminé lorsque le serveur envoie le délimiteur 
 
 - Pour le code ```200``` (OK).
     - Confirmation du début du téléchargement: ```<titre_video>```
-
 - Pour le code ```404``` (NOT_FOUND)
     - La video demandée n'existe pas: ```Invalid/unknown video choice```
 - Pour le code ```403``` (FORBIDDEN)
