@@ -43,6 +43,10 @@ public class UploadCommand extends Command {
             return new CommandResponse(CommandResponseCode.ERROR, "Invalid Base64 encoding");
         }
 
+        if(streamingVideo.titleExists(title)){
+            return new CommandResponse(CommandResponseCode.ERROR, "Video title already exists");
+        }
+
         try {
             sendResponse(new CommandResponse(CommandResponseCode.OK, "Ready to receive video"));
 

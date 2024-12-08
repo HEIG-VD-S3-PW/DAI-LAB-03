@@ -9,11 +9,11 @@ import picocli.CommandLine;
 @CommandLine.Command(
         name = "Client",
         description = {
-                "Start the client to connect to the streaming server.",
+                "Start the client to connect to the video manager server.",
                 "\nOnce connected the following commands are available:",
                 "DELETE <id>   Delete a video that you select with it's number.",
                 "LIST          Show all videos from the server",
-                "WATCH <id>    Watch a specific video by using it's number",
+                "DOWNLOAD <id> Download a specific video by using it's number",
                 "UPLOAD        Upload a new video",
                 "QUIT          Close the connection with the server"
         },
