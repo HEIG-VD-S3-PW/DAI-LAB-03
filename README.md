@@ -311,6 +311,48 @@ docker rm ammar-server
 docker network rm ammar-net
 ```
 
+## Publish the image on GitHub Container Registry
+
+Before publishing the image, you need to build it:
+
+```bash
+docker build -t streaming-app .
+```
+
+First step: Create a new Personal Access Token on GitHub → Settings → Developer settings → Personal access tokens.
+Add the scopes: write:packages, read:packages, delete:packages and then copy the value of the new token.
+
+In your terminal type:
+
+```bash
+echo "YOUR_GITHUB_TOKEN" | docker login ghcr.io -u YOUR_GITHUB_USERNAME --password-stdin
+```
+
+Second step: Tag your image for GitHub Container registry:
+
+```bash
+docker tag streaming-app:latest ghcr.io/HEIG-VD-S3-PW/DAI-LAB-03:latest
+```
+dai-lab-03 is the image name, HEIG-VD-S3-PW is the owner and latest is the tag.
+
+Third step: Push the docker image to GitHub Container Registry:
+
+```bash
+docker push ghcr.io/HEIG-VD-S3-PW/DAI-LAB-03:latest
+```
+
+Last step: Verify the Image on GitHub:
+
+1. Go to your GitHub profile or organization.
+2. Navigate to the "Packages" section.
+3. Your Docker image should appear there, you should then be able to see details such as the tag and the version.
+
+To pull the new image use the command:
+
+```bash
+docker pull ghcr.io/HEIG-VD-S3-PW/DAI-LAB-03:latest
+```
+
 ---
 
 ## Command Summary
