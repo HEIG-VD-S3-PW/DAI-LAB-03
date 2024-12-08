@@ -1,56 +1,51 @@
 # Video Manager Application Protocol
 
 ## 1. Overview
-Le protocole "Video Manager Application" (VMA) est un protocole permettant de récupérer ou déposer des fichiers vidéos sur
-un serveur. Il vise à simplifier le partage de vidéos entre utilisateurs.
-
+Video Manager Application (VMA) is a protocol for retrieving and uploading video files to a server. Its aim is to 
+simplify video sharing between users.
 
 ## 2. Transport protocol
-VMA est un protocle client-serveur qui permet le listage, l'ajout, la suppression et le téléchargement de vidéos.  
+VMA is a client-server protocol for listing, uploading, downloading and deleting videos.  
+VMA uses the __TCP protocol__ for these exchanges.  
+The default port is __1986__.
 
-VMA utilise le __protocole TCP__ pour ces échanges. 
+The exchanges between client and server are as follows:
+- Sending a command and its arguments from the client to the server.
+- Transfer of data in the form of text encoded in Base64. These exchanges are from client to server during an upload and
+  from server to client during a download. The delimiters are ``END_OF_UPLOAD`` and ``END_OF_DOWNLOAD`` respectively.
+- Sending a code followed by a message from the server to the client. The code can represent a confirmation or an error.
+  The message describes the code.
 
-Par défaut, le port à utiliser est __1986__.
+For all commands, a server-side validity check is performed on the command and its arguments. If the execution of the 
+command encounters a problem, the server will send an error to the client. In the event of an error, the client will 
+display the message.  
 
-Les échanges entre client et serveur sont les suivants :
-- Envoie d'une commande et de ses arguments du client au serveur.
-- Transfert de données sous forme de texte encodé en Base64. Ces échanges sont de client à serveur lors d'un upload et
-  de serveur à client lors d'un download. Les délimiteurs sont respectivement ```END_OF_UPLOAD``` et ```END_OF_DOWNLOAD```.
-- Envoie d'un code suivit d'un message du serveur au client. Le code peut représenter une confirmation ou une erreur.
-  Le message décrit le code.
+If it manages to connect to the server, the client must connect to the service before it can send any more
+messages. It is __the client that initiates the connection__. Using the ``CONNECT`` command allows you to launch an 
+interactive authentication managed by the client. The client asks the user for and verifies his username and email 
+address. It then builds the command and sends it to the server.  
+Alternatively, it is possible to send ``CONNECT <Username> <Email>`` directly, in which case management is carried out 
+solely by the server.
+The server returns a confirmation.
 
+The user can request the list of videos. The server will then send confirmation code and a list of the videos
+that are available.
 
-Pour toutes les commandes, un contrôle de validité est effectué côté serveur sur la commande et ses arguments. Si
-l'exectution de la commande rencontre un problème, le serveur enverra une erreur au client. En cas d'erreur, le client
-affichera le message.
+The user can request to download a video. The server returns a confirmation and starts sending the data. When the client
+receives confirmation, it starts receiving the data. The end of the transmission is marked by its delimiter.
 
-Si il parvient à se connecter au serveur, le client doit se connecter au service avant de pouvoir envoyer d'autres
-messages. C'est __le client qui initie la connexion__. L'utilisation de la commande ```CONNECT``` permet de lancer une
-authentification interactive gérée par le client. Celui-ci demande à l'utilisateur et vérifie son username et email. Il
-construit ensuite la commande et l'envoie au serveur.  
-Sinon, il est possbile d'envoyer directement ```CONNECT <Username> <Email>```, la gestion est alors uniquement effectuée
-par le serveur.  
-Le serveur retourne une confirmation.
+The user can ask to upload a video to the server. Using the ``UPLOAD`` command launches an interactive interface for 
+setting the upload parameters managed by the client. The client asks the user and checks the title, description and path
+of the video. It then builds the command and sends it to the server.  
+The server returns a confirmation so that the transfer can begin. At the end of the transfer, the client sends the 
+defined delimiter and the server returns a confirmation.
 
-L'utilisateur peut demander la liste des vidéos. Le serveur lui retourne alors une confirmation et la liste des vidéos
-qui sont disponibles. En cas de problème, le serveur retourne une erreur.
+The user can request that a video be deleted. The server checks that the video exists and that it is available for 
+deletion. If so, it deletes it. Otherwise it returns an error. It must not be possible to delete a video being uploaded
+by another user.
 
-L'utilisateur peut demander à télécharger une vidéo. Le serveur retourne une confirmation et commence à envoyer les
-données. Lorsque le client reçoit la confirmation, il commence à receptionner les données. La fin de l'envoi est marqué
-par son délimiteur.
-
-L'utilisateur peut demander à ajouter une vidéo au server. L'utilisation de la commande UPLOAD permet de lancer un
-interface interactif pour le parametrage de l'upload gérée par le client. Celui-ci demande à l'utilisateur et vérifie le
-titre, la description et le chemin de la video. Il construit ensuite la commande et l'envoie au serveur.  
-Le serveur retourne une confirmation pour que le transfert commence. À la fin du transfert, le client envoie le délimiteur
-défini et le serveur retourne une confirmation.
-
-
-L'utilisateur peut demander à supprimer une vidéo. Le serveur contrôle que la vidéo existe et qu'elle est disponible pour
-être supprimée. Si c'est le cas, il la supprime. Sinon il retourne une erreur. Il ne doit pas être possible de supprimer une vidéo en cours de téléchargement par un autre utilisateur.
-
-Lorsque le client a fini d'utiliser le service, il utilise la commande (QUIT) pour terminer la connexion. L'utilisateur 
-est alors supprimé de la liste des utilisateurs et le serveur retourne une confirmation.
+When the client has finished using the service, it uses the ```QUIT``` command to end the connection. The user is then is 
+then removed from the list of users and the server returns a confirmation.  
 
 ## 3. Messages
 Dans tout les cas, le serveur va répondre avec un code et un message.
