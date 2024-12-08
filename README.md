@@ -29,7 +29,6 @@ A command-line utility to select videos on a remote server so you can then downl
 ## Requirements
 - **Java**: You need to have Java 21 installed.
 - **Maven**: Ensure you have Maven installed to manage dependencies and build the project.
-- 
 ---
 
 ## Installation
@@ -63,8 +62,9 @@ target/DAI-LAB-03-1.0-SNAPSHOT.jar
 The application is a CLI tool that help you choose videos to download. You need to identify yourself first before choosing between the available videos.
 Available Commands
 
-    client: Start the client connection to the server.
-    server: Start the server.
+    Client: Start the client to connect to the video manager server.
+    Server: Start the server to accept remote connections
+
 
 Shared options
 
@@ -90,7 +90,7 @@ java -jar target/DAI-LAB-03-1.0-SNAPSHOT.jar --help
 
 Output:
 
-```vbnet
+```
 ======= Ammar Video Platform =======
 
 Download, upload and remove videos from/to a remote server
@@ -98,7 +98,7 @@ Download, upload and remove videos from/to a remote server
 Usage: DAI-LAB-03-1.0-SNAPSHOT.jar [-hV] [COMMAND]
 
 Description:
-A command-line utility to stream videos from a remote server.
+A command-line utility to manage videos from a remote server.
 
 Options:
   -h, --help      Show this help message and exit.
@@ -113,50 +113,52 @@ Credits: Tristan Baud, Arno Tribolet and Mathieu Emery
 
 The commands "Client" and "Server" also have a custom help page:
 
+__Client Help Command__
 ```bash
 java -jar target/DAI-LAB-03-1.0-SNAPSHOT.jar Client --help
 ```
 
-```vbnet
+
+```
 === Client Command ===
 
 Usage: DAI-LAB-03-1.0-SNAPSHOT.jar Client -H=<host> [-p=<port>]
 
 Description:
-Start the client to connect to the streaming server.
+Start the client to connect to the video manager server.
 
 Once connected the following commands are available:
-DELETE <id>     Delete a video that you select with it's number.
-LIST            Show all videos from the server
-DOWNLOAD <id>   Download a specific video by using it's number
-UPLOAD          Upload a new video
+DELETE <id>   Delete a video that you select with it's number.
+LIST          Show all videos from the server
+DOWNLOAD <id> Download a specific video by using it's number
+UPLOAD        Upload a new video
+QUIT          Close the connection with the server
 
 Options:
   -H, --host=<host>   Host to connect to.
   -p, --port=<port>   Port to use (default: 1986).
 
 Credits: Tristan Baud, Arno Tribolet and Mathieu Emery
-
 ```
+__Server Help Command__
 
 ```bash
 java -jar target/DAI-LAB-03-1.0-SNAPSHOT.jar Server --help
 ```
 
-```vbnet
+```
 === Server Command ===
 
-Usage: DAI-LAB-03-1.0-SNAPSHOT.jar Server [-p=<port>]
+Usage: DAI-LAB-03-1.0-SNAPSHOT.jar Server [-c=<threads>] [-p=<port>]
 
 Description:
 Start the server to accept remote connections
 
 Options:
-  -p, --port=<port>   Port to use (default: 1986).
-  -c, --clients=<clients>   Maximum number of clients to accept (default: 10).
+  -c, --clients=<threads>   Number of clients simultaneously connected (default: 10).
+  -p, --port=<port>         Port to use (default: 1986).
 
 Credits: Tristan Baud, Arno Tribolet and Mathieu Emery
-
 ```
 
 ## Examples without Docker
@@ -184,45 +186,91 @@ java -jar target/DAI-LAB-03-1.0-SNAPSHOT.jar Client -H localhost
 
 Output:
 
-```arduino
+```
+COMMANDS: DELETE UPLOAD DOWNLOAD QUIT CONNECT LIST 
 > CONNECT
 Enter your pseudo:
 ```
 
 The client will then have to enter his pseudo (Will ask you to re-enter it if you don't):
 
-```arduino
+```
+COMMANDS: DELETE UPLOAD DOWNLOAD QUIT CONNECT LIST 
 > CONNECT
 Enter your pseudo: 
 Enter your pseudo: toto
 Enter your email:
 ```
 
-After that, the client must enter a valid email (checked by a regex) to access the list of video:
+After that, the client must enter a valid email (checked by a regex on client and server side):
 
-```arduino
-Welcome to the Amar Streaming Platform !
+```
+COMMANDS: DELETE UPLOAD DOWNLOAD QUIT CONNECT LIST 
+> CONNECT
 Enter your pseudo: 
 Enter your pseudo: toto
 Enter your email: toto@exemple.com
+Connection successfull
+>
 ```
 
 After that, the CONNECT command ask for the connection and, if it is accepted, the client will be able to use the following commands at will:
 
-- DELETE <id> : Delete the video with the <id> number 
-- LIST: List all videos on the server
-- DOWNLOAD <id> : Download the video with the <id> number 
-- UPLOAD: Upload a video
+- `DELETE <id>`: Delete the video with the <id> number 
+- `LIST`: List all videos on the server
+- `DOWNLOAD <id>`: Download the video with the <id> number 
+- `UPLOAD`: Upload a video
 
-Example with the command LIST:
+#### Example with the command `LIST`:
 
-```bash
+```
 > LIST
 1) 3 Minute Timer - Displays a timer from 3 minutes to 0
 2) Google Office tour - Visit of Google's building
-3) L'entretien - Choss - Vidéo de Choss sur un entretien
-4) Why is Switzerland home to so many billionaires - Documentary on Switzerland's billionaires
+3) Why is Switzerland home to so many billionaires - Documentary on Switzerland's billionaires
+4) L'entretien de Choss - Vidéo de Choss passant un entretien
 >
+```
+
+##### Example with the command `DOWNLOAD`:
+
+```
+> DOWNLOAD 1
+Download complete !
+```
+
+The video with the number 1 will be downloaded in the client_data folder.
+
+
+#### Example with the command `UPLOAD`:
+
+```
+> UPLOAD
+Enter the title of the video: Titre test
+Enter the description of the video: Titre description
+Enter the path of the video file: test.mp4
+Ready to receive video
+Upload complete! Waiting for server confirmation...
+Video uploaded successfully
+> 
+```
+
+The video will be uploaded to the server and will be available for download. __The video to upload must be in the client_data folder.__
+
+
+#### Example with the command `DELETE`:
+
+```
+> DELETE 5
+Video deleted
+> 
+```
+
+#### Example with the command `QUIT`:
+
+```
+> QUIT
+See you soon :)
 ```
 
 ## Examples with Docker
@@ -337,6 +385,31 @@ public CommandRegistry(BufferedReader in, BufferedWriter out) {
 Now your command is available to use in the application.
 
 __Moreover, if you choose to contribute to the project by adding a new command, a diagram of the correct and wrong use of the command is required.__
+
+### Adding a new process (client side only)
+
+If you want to help the user to use the command correctly, you can add a new process to the command. To do this, you need to create a new class that extends the Process class and implement the execute method.
+
+__Example of `CONNECT` command:__
+
+```java
+public class SignInClientProcess extends Process {
+    
+    public SignInClientProcess(BufferedReader in, BufferedWriter out) { super(in, out); }
+
+    @Override
+    public boolean execute() throws Exception {
+        String pseudo = Utils.askForInput("Enter your pseudo: ", null);
+        String email = Utils.askForInput("Enter your email: ", Utils::emailValidation);
+        Utils.send(out, "CONNECT " + pseudo + " " + email);
+        return true;
+    }
+}
+```
+
+The add a condition in the function `handleSpecialCommand` in the TCPClient class. 
+
+The Process class helps guide users through command execution and enables the exchange of complex data beyond simple PING-PONG messages.
 
 ---
 
