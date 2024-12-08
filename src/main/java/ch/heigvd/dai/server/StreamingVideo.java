@@ -20,6 +20,9 @@ public class StreamingVideo {
     }
 
 
+    /**
+     * Load the videos from the server directory
+     */
     public void load() {
         File directory = new File(Utils.SERVER_VIDEO_PATH);
         File[] videoFiles = directory.listFiles();
@@ -108,6 +111,21 @@ public class StreamingVideo {
         return resourceManager.canDeleteVideo(videoTitle);
     }
 
+
+    /**
+     * Check if a video already exists
+     *
+     * @param title the title of the video
+     * @return true if the video already exists, false otherwise
+     */
+    public boolean titleExists(String title) {
+        for (Video video : getVideos()) {
+            if (video.getTitle().equalsIgnoreCase(title)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * Delete a video from the server

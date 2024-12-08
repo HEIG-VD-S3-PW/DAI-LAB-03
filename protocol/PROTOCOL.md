@@ -1,8 +1,8 @@
-# Streaming Video Manager
+# Video Manager Application Protocol
 
 ## 1. Overview
 Le protocole "Video Manager Application" (VMA) est un protocole permettant de récupérer ou déposer des fichiers vidéos sur
-un serveur.
+un serveur. Il vise à simplifier le partage de vidéos entre utilisateurs.
 
 
 ## 2. Transport protocol
@@ -57,7 +57,12 @@ Dans tout les cas, le serveur va répondre avec un code et un message.
 
 - ``` <CommandResponseCode> <Message>```
 
-Liste des codes : 200 (OK), 500 (ERROR), 404 (NOT_FOUND), 403 (FORBIDDEN), 401 (UNAUTHORIZED).
+Liste des codes : 
+- 200 (OK)
+- 500 (ERROR)
+- 404 (NOT_FOUND)
+- 403 (FORBIDDEN)
+- 401 (UNAUTHORIZED).
 
 Pour l'ensemble des commandes, sauf ```CONNECT``` et ```QUIT```, le serveur répondra toujours par le code ```401```
 (UNAUTHORIZED) et par le message ```You have to be connected to execute this command``` si le client n'est pas connecté.
@@ -105,7 +110,7 @@ Le client demande au serveur la liste des vidéos.
 
 ### Téléchargement d'une vidéo
 
-Le client demande au serveur pour télécharger une vidéo. Cette commande se passe en deux temps. Premièrement, le serveur confirme que la vidéo est disponible en envoyant un code ```200``` (OK) et le titre de la vidéo. Ensuite, le serveur envoie les données de la vidéo sous forme de flux.
+Le client demande au serveur pour télécharger une vidéo. Cette commande se passe en deux temps. Premièrement, le serveur confirme que la vidéo est disponible en envoyant un code ```200``` (OK) et le titre de la vidéo. Ensuite, le serveur envoie les données de la vidéo __sous forme de flux envoyé par chunk et encodé en Base64__.
 
 Le flux est considéré comme terminé lorsque le serveur envoie le délimiteur ```END_OF_DOWNLOAD```. Lorsque le client reçoit ce délimiteur, il arrête de lire les données, et le téléchargement est considéré comme terminé.
 
@@ -140,7 +145,7 @@ Le client demande au serveur pour déposer une vidéo.
 
 #### Réponse
 
-La réponse se fait en trois temps. Le serveur confirme ou non les informations reçue pour lancer le transfert. Après cette confirmation, le serveur se prépare à recevoir les données de la vidéo sous forme de flux envoyé par chunk et encodé en Base64.
+La réponse se fait en trois temps. Le serveur confirme ou non les informations reçue pour lancer le transfert. Après cette confirmation, le serveur se prépare à recevoir les données de la vidéo __sous forme de flux envoyé par chunk et encodé en Base64__.
 
 Le flux est considéré comme terminé lorsque le client envoie le délimiteur ```END_OF_UPLOAD```. Le serveur confirme ensuite si le transfert c'est bien passé, et la vidéo est alors disponible.
 
@@ -149,6 +154,7 @@ Le flux est considéré comme terminé lorsque le client envoie le délimiteur `
         - Confirmation du début du téléchargement: ```Ready to receive video```
     - Pour le code ```500``` (ERROR)
         - Problème dans l'encodage du titre ou de la descritpion: ```Invalid Base64 encoding```
+        - Si le titre existe déjà: ```Video title already exists```
         - Si le nombre d'arguments n'est pas valide:
           ```Server error : The upload command expects title and description```
     - Pour le coce ```401``` (UNAUTHORIZED)
@@ -201,9 +207,7 @@ Le client se décocnnecte du serveur.
 - Pour le code ```200``` (OK).
     - Confirmation de la déconnexion: ```See you soon :)```
 
-#### Exception
-
-Côté serveur aucune exception précise est gérée. Le serveur renvoie dans tous les cas un code ```200```, même si par exemple le client n'était pas connecté.
+_Le serveur renverra toujours une confirmation de déconnexion, même si l'utilisateur n'était pas connecté._
 
 
 ## Examples

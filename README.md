@@ -4,6 +4,8 @@
 
 A command-line utility to select videos on a remote server so you can then download them. The application allows you to easily connect yourself remotely to the server, upload, download, delete, and list videos.
 
+The application protocol is available in the [PROTOCOL.md](protocol/PROTOCOL.md) file.
+
 ## Table of Contents
 
 - [Features](#features)
@@ -349,7 +351,7 @@ Run the application: Once built, you can run the application using:
 java -jar target/DAI-LAB-03-1.0-SNAPSHOT.jar
 ```
 
-Testing the application: You can also run the tests using Maven:
+Testing the application: You can also run the tests using Maven (no test by default):
 
 ```bash
 mvn test
