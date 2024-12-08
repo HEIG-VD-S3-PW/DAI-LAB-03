@@ -1,13 +1,13 @@
 # Streaming Video Manager
 
 ## 1. Overview
-Le protocole "Streaming Video Manager" (SVM) est un protocole permettant de récupérer ou déposer des fichiers vidéos sur
+Le protocole "Video Manager Application" (VMA) est un protocole permettant de récupérer ou déposer des fichiers vidéos sur
 un serveur.
 
 
 ## 2. Transport protocol
-SVM est un protocle client-serveur qui permet le listage, l'ajout, la suppression et le téléchargement de vidéos.  
-SVM utilise le protocole TCP pour ces échanges. Par défaut, le port à utiliser est 1986.
+VMA est un protocle client-serveur qui permet le listage, l'ajout, la suppression et le téléchargement de vidéos.  
+VMA utilise le protocole TCP pour ces échanges. Par défaut, le port à utiliser est 1986.
 
 Les échanges entre client et serveur sont les suivants :
 - Envoie d'une commande et de ses arguments du client au serveur.
@@ -101,7 +101,9 @@ Le client demande au serveur la liste des vidéos.
 
 ### Téléchargement d'une vidéo
 
-Le client demande au serveur pour télécharger une vidéo.
+Le client demande au serveur pour télécharger une vidéo. Cette commande se passe en deux temps. Premièrement, le serveur confirme que la vidéo est disponible en envoyant un code ```200``` (OK) et le titre de la vidéo. Ensuite, le serveur envoie les données de la vidéo sous forme de flux.
+
+Le flux est considéré comme terminé lorsque le serveur envoie le délimiteur ```END_OF_DOWNLOAD```. Lorsque le client reçoit ce délimiteur, il arrête de lire les données, et le téléchargement est considéré comme terminé.
 
 #### Message
 
@@ -135,8 +137,9 @@ Le client demande au serveur pour déposer une vidéo.
 
 #### Réponse
 
-La réponse se fait en deux temps. Le serveur confirme ou non les informations reçue pour lancer le transfert. Le serveur
-confirme ou non que le transfert c'est bien passé.
+La réponse se fait en trois temps. Le serveur confirme ou non les informations reçue pour lancer le transfert. Après cette confirmation, le serveur se prépare à recevoir les données de la vidéo sous forme de flux envoyé par chunk et encodé en Base64.
+
+Le flux est considéré comme terminé lorsque le client envoie le délimiteur ```END_OF_UPLOAD```. Le serveur confirme ensuite si le transfert c'est bien passé, et la vidéo est alors disponible.
 
 - Validation pour débuter le transfert
     - Pour le code ```200``` (OK)
@@ -145,7 +148,8 @@ confirme ou non que le transfert c'est bien passé.
         - Problème dans l'encodage du titre ou de la descritpion: ```Invalid Base64 encoding```
         - Si le nombre d'arguments n'est pas valide:
           ```Server error : The upload command expects title and description```
-
+    - Pour le coce ```401``` (UNAUTHORIZED)
+        - L'utilisateur n'est pas connecté: ```You have to be connected to execute this command```
 
 - Confirmation du transfert
     - Pour le code ```200``` (OK)
@@ -181,23 +185,22 @@ Le client demande au serveur de supprimer une vidéo.
 En cas d'exception lors de la suppression, le serveur retournera un code ```500``` (ERROR) suivit du message ```Server 
 error : <Exception_message>```  
 
-### Suppression d'une vidéo
+### Déconnexion du serveur
 
-Le client demande au serveur de supprimer une vidéo.
+Le client se décocnnecte du serveur.
 
 #### Message
 
-```QUITs```
+```QUIT```
 
 #### Réponse
 
 - Pour le code ```200``` (OK).
-    - Confirmation de la suppression: ```Video deleted```
+    - Confirmation de la déconnexion: ```See you soon :)```
 
 #### Exception
 
-En cas d'exception lors de la suppression, le serveur retournera un code ```500``` (ERROR) suivit du message ```Server 
-error: <Exception_message>```
+Côté serveur aucune exception précise est gérée. Le serveur renvoie dans tous les cas un code ```200```, même si par exemple le client n'était pas connecté.
 
 
 ## Examples
