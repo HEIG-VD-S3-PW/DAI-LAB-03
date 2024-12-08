@@ -1,214 +1,212 @@
 # Video Manager Application Protocol
 
 ## 1. Overview
-Le protocole "Video Manager Application" (VMA) est un protocole permettant de récupérer ou déposer des fichiers vidéos sur
-un serveur. Il vise à simplifier le partage de vidéos entre utilisateurs.
-
+Video Manager Application (VMA) is a protocol for retrieving and uploading video files to a server. Its aim is to 
+simplify video sharing between users.
 
 ## 2. Transport protocol
-VMA est un protocle client-serveur qui permet le listage, l'ajout, la suppression et le téléchargement de vidéos.  
+VMA is a client-server protocol for listing, uploading, downloading and deleting videos.  
+VMA uses the __TCP protocol__ for these exchanges.  
+The default port is __1986__.
 
-VMA utilise le __protocole TCP__ pour ces échanges. 
+The exchanges between client and server are as follows:
+- Sending a command and its arguments from the client to the server.
+- Transfer of data in the form of text encoded in Base64. These exchanges are from client to server during an upload and
+  from server to client during a download. The delimiters are ``END_OF_UPLOAD`` and ``END_OF_DOWNLOAD`` respectively.
+- Sending a code followed by a message from the server to the client. The code can represent a confirmation or an error.
+  The message describes the code.
 
-Par défaut, le port à utiliser est __1986__.
+For all commands, a server-side validity check is performed on the command and its arguments. If the execution of the 
+command encounters a problem, the server will send an error to the client. In the event of an error, the client will 
+display the message.  
 
-Les échanges entre client et serveur sont les suivants :
-- Envoie d'une commande et de ses arguments du client au serveur.
-- Transfert de données sous forme de texte encodé en Base64. Ces échanges sont de client à serveur lors d'un upload et
-  de serveur à client lors d'un download. Les délimiteurs sont respectivement ```END_OF_UPLOAD``` et ```END_OF_DOWNLOAD```.
-- Envoie d'un code suivit d'un message du serveur au client. Le code peut représenter une confirmation ou une erreur.
-  Le message décrit le code.
+If it manages to connect to the server, the client must connect to the service before it can send any more
+messages. It is __the client that initiates the connection__. Using the ``CONNECT`` command allows you to launch an 
+interactive authentication managed by the client. The client asks the user for and verifies his username and email 
+address. It then builds the command and sends it to the server.  
+Alternatively, it is possible to send ``CONNECT <Username> <Email>`` directly, in which case management is carried out 
+solely by the server.
+The server returns a confirmation.
 
+The user can request the list of videos. The server will then send confirmation code and a list of the videos
+that are available.
 
-Pour toutes les commandes, un contrôle de validité est effectué côté serveur sur la commande et ses arguments. Si
-l'exectution de la commande rencontre un problème, le serveur enverra une erreur au client. En cas d'erreur, le client
-affichera le message.
+The user can request to download a video. The server returns a confirmation and starts sending the data. When the client
+receives confirmation, it starts receiving the data. The end of the transmission is marked by its delimiter.
 
-Si il parvient à se connecter au serveur, le client doit se connecter au service avant de pouvoir envoyer d'autres
-messages. C'est __le client qui initie la connexion__. L'utilisation de la commande ```CONNECT``` permet de lancer une
-authentification interactive gérée par le client. Celui-ci demande à l'utilisateur et vérifie son username et email. Il
-construit ensuite la commande et l'envoie au serveur.  
-Sinon, il est possbile d'envoyer directement ```CONNECT <Username> <Email>```, la gestion est alors uniquement effectuée
-par le serveur.  
-Le serveur retourne une confirmation.
+The user can ask to upload a video to the server. Using the ``UPLOAD`` command launches an interactive interface for 
+setting the upload parameters managed by the client. The client asks the user and checks the title, description and path
+of the video. It then builds the command and sends it to the server.  
+The server returns a confirmation so that the transfer can begin. At the end of the transfer, the client sends the 
+defined delimiter and the server returns a confirmation.
 
-L'utilisateur peut demander la liste des vidéos. Le serveur lui retourne alors une confirmation et la liste des vidéos
-qui sont disponibles. En cas de problème, le serveur retourne une erreur.
+The user can request that a video be deleted. The server checks that the video exists and that it is available for 
+deletion. If so, it deletes it. Otherwise it returns an error. It must not be possible to delete a video being uploaded
+by another user.
 
-L'utilisateur peut demander à télécharger une vidéo. Le serveur retourne une confirmation et commence à envoyer les
-données. Lorsque le client reçoit la confirmation, il commence à receptionner les données. La fin de l'envoi est marqué
-par son délimiteur.
-
-L'utilisateur peut demander à ajouter une vidéo au server. L'utilisation de la commande UPLOAD permet de lancer un
-interface interactif pour le parametrage de l'upload gérée par le client. Celui-ci demande à l'utilisateur et vérifie le
-titre, la description et le chemin de la video. Il construit ensuite la commande et l'envoie au serveur.  
-Le serveur retourne une confirmation pour que le transfert commence. À la fin du transfert, le client envoie le délimiteur
-défini et le serveur retourne une confirmation.
-
-
-L'utilisateur peut demander à supprimer une vidéo. Le serveur contrôle que la vidéo existe et qu'elle est disponible pour
-être supprimée. Si c'est le cas, il la supprime. Sinon il retourne une erreur. Il ne doit pas être possible de supprimer une vidéo en cours de téléchargement par un autre utilisateur.
-
-Lorsque le client a fini d'utiliser le service, il utilise la commande (QUIT) pour terminer la connexion. L'utilisateur 
-est alors supprimé de la liste des utilisateurs et le serveur retourne une confirmation.
+When the client has finished using the service, it uses the ```QUIT``` command to end the connection. The user is then is 
+then removed from the list of users and the server returns a confirmation.  
 
 ## 3. Messages
-Dans tout les cas, le serveur va répondre avec un code et un message.
 
+In all cases, the server will respond with a code and a message.  
 - ``` <CommandResponseCode> <Message>```
 
-Liste des codes : 
+Codes list: 
 - 200 (OK)
 - 500 (ERROR)
 - 404 (NOT_FOUND)
 - 403 (FORBIDDEN)
 - 401 (UNAUTHORIZED).
 
-Pour l'ensemble des commandes, sauf ```CONNECT``` et ```QUIT```, le serveur répondra toujours par le code ```401```
-(UNAUTHORIZED) et par le message ```You have to be connected to execute this command``` si le client n'est pas connecté.
+For all commands except ```CONNECT``` and ```QUIT```, the server will always respond with the code ```401``` 
+(UNAUTHORIZED) and with the message ```You have to be connected to execute this command``` if the client is not connected.
+### Connection to the server
 
-### Connexion au serveur
-
-Le client demande au serveur pour se connecter.
+The client asks the server to connect.  
 
 #### Message
 
 ```CONNECT <pseudo> <email>```
 
-#### Réponse
+#### Response
 
-- Pour le code ```200``` (OK). La connexion est validée.
-  ```Connection successfull```
+- For code ```200``` (OK). 
+  - The connection is confirmed:
+    ```Connection successfull```
 
-- Pour le code ```500``` (ERROR)
-
-    - Si le pseudo est invalide:
+- For code ```500``` (ERROR)
+    - If the username is invalid:
       ```Invalid pseudo```
-    - Si l'adresse mail est invalide:
+    - If the email address is invalid:
       ```Invalid email address```
-    - Si l'utilisateur existe déjà:
+    - If the user already exists:
       ```User already exists```
-    - Si le nombre d'arguments n'est pas valide:
+    - If the number of arguments is invalid:
       ```Server error : The connect command expects exactly two arguments (CONNECT <pseudo> <email>)```
 
-### Lister les vidéos
+### Listing videos
 
-Le client demande au serveur la liste des vidéos.
+The client asks the server for the list of videos.
 
 #### Message
 
 ```LIST```
 
-#### Réponse
+#### Response
 
-- Pour le code ```200``` (OK), on reçoit la liste des vidéos disponibles.   
-  ```1,<titre_1>,<description_1>;2,<titre_2>,<description_2>;...;n,<titre_n>,<description_n>;```
+- For code ```200``` (OK) 
+  - You will receive a list of available videos: 
+    ```1,<titre_1>,<description_1>;2,<titre_2>,<description_2>;...;n,<titre_n>,<description_n>;```
 
-- Pour le code ```404``` (NOT_FOUND)
-    - Pas de vidéos stockées sur le serveur:
+- For code ```404``` (NOT_FOUND)
+    - No videos stored on the server:
       ```No videos found```
 
-### Téléchargement d'une vidéo
+### Downloading a video
 
-Le client demande au serveur pour télécharger une vidéo. Cette commande se passe en deux temps. Premièrement, le serveur confirme que la vidéo est disponible en envoyant un code ```200``` (OK) et le titre de la vidéo. Ensuite, le serveur envoie les données de la vidéo __sous forme de flux envoyé par chunk et encodé en Base64__.
-
-Le flux est considéré comme terminé lorsque le serveur envoie le délimiteur ```END_OF_DOWNLOAD```. Lorsque le client reçoit ce délimiteur, il arrête de lire les données, et le téléchargement est considéré comme terminé.
+The client asks the server to download a video. This command takes place in two stages. Firstly, the server confirms 
+that the video is available by sending a ```200``` code (OK) and the title of the video. Next, the server sends the 
+video data __in the form of a chunk stream encoded in Base64__.  
+The stream is considered complete when the server sends the ```END_OF_DOWNLOAD``` delimiter. When the client receives this
+delimiter, it stops reading the data, and the download is considered complete.  
 
 #### Message
 
 ```DOWNLOAD <videoChoice>```
 
-#### Réponse
+#### Response
 
-- Pour le code ```200``` (OK).
-    - Confirmation du début du téléchargement: ```<titre_video>```
-- Pour le code ```404``` (NOT_FOUND)
-    - La video demandée n'existe pas: ```Invalid/unknown video choice```
-- Pour le code ```403``` (FORBIDDEN)
-    - La vidéo n'est actuellement pas disponible: ```Video is currently being deleted or is unavailable```
-- Pour le code ```500``` (ERROR)
-    - Si le nombre d'arguments n'est pas valide:
+- For code ```200``` (OK).
+    - Confirmation that the download has started: ```<video_title>```
+- For code ```404``` (NOT_FOUND)
+    - The requested video does not exist: ```Invalid/unknown video choice```
+- For code ```403``` (FORBIDDEN)
+    - The video is currently unavailable: ```Video is currently being deleted or is unavailable```
+- For code ```500``` (ERROR)
+    - If the number of arguments is invalid:
       ```Server error : The download command expects exactly one argument (DOWNLOAD <videoChoice>)```
 
 #### Exception
 
-En cas d'exception lors du transfert, le serveur retournera un code ```500``` (ERROR) suivit du message ```Error while 
-downloading video : <Exception_message>```
+In the event of an exception during the transfer, the server will return a code ```500``` (ERROR) followed by the 
+message ```Error while downloading video: <Exception_message>```
 
-### Dépôt d'une vidéo
+### Uploading a video
 
-Le client demande au serveur pour déposer une vidéo.
+The client asks the server to upload a video.  
 
 #### Message
 
 ```UPLOAD <Base64_titre> <Base64_description>```
 
-#### Réponse
+#### Response
 
-La réponse se fait en trois temps. Le serveur confirme ou non les informations reçue pour lancer le transfert. Après cette confirmation, le serveur se prépare à recevoir les données de la vidéo __sous forme de flux envoyé par chunk et encodé en Base64__.
+The response takes place in three stages. The server confirms whether or not it has received the information to start 
+the transfer. After this confirmation, the server prepares to receive the video data __in the form of a stream sent by 
+chunk and encoded in Base64__.  
+The stream is considered complete when the client sends the ```END_OF_UPLOAD`` delimiter. The server then confirms 
+whether the transfer was successful, and the video is then available.
 
-Le flux est considéré comme terminé lorsque le client envoie le délimiteur ```END_OF_UPLOAD```. Le serveur confirme ensuite si le transfert c'est bien passé, et la vidéo est alors disponible.
-
-- Validation pour débuter le transfert
-    - Pour le code ```200``` (OK)
-        - Confirmation du début du téléchargement: ```Ready to receive video```
-    - Pour le code ```500``` (ERROR)
-        - Problème dans l'encodage du titre ou de la descritpion: ```Invalid Base64 encoding```
-        - Si le titre existe déjà: ```Video title already exists```
-        - Si le nombre d'arguments n'est pas valide:
+- Validation to start the upload
+    - For code ```200``` (OK)
+        - Confirmation that the server is ready to receive the transmission: ```Ready to receive video```
+    - For code ```500``` (ERROR)
+        - Problem in encoding the title or description: ```Invalid Base64 encoding```
+        - If the title already exists: ```Video title already exists```
+        - If the number of arguments is invalid:
           ```Server error : The upload command expects title and description```
-    - Pour le coce ```401``` (UNAUTHORIZED)
-        - L'utilisateur n'est pas connecté: ```You have to be connected to execute this command```
+    - For code ```401``` (UNAUTHORIZED)
+        - The user is not connected: ```You have to be connected to execute this command```
 
-- Confirmation du transfert
-    - Pour le code ```200``` (OK)
-        - Confirmation du succès du téléchargement: ```Video uploaded successfully```
+- Confirmation of upload
+    - For code ```200``` (OK)
+        - Confirmation that the upload completed successfully ```Video uploaded successfully```
 
 #### Exception
 
-En cas d'exception lors du transfert, le serveur retournera un code ```500``` (ERROR) suivit du message ```Error while 
-uploading video : <Exception_message>```
+In the event of an exception during the upload, the server will return a code ```500``` (ERROR) followed by the message
+```Error while uploading video : <Exception_message>```
 
-### Suppression d'une vidéo
+### Deleting a video
 
-Le client demande au serveur de supprimer une vidéo.
+The client asks the server to delete a video.
 
 #### Message
 
 ```DELETE <videoChoice>```
 
-#### Réponse
+#### Response
 
-- Pour le code ```200``` (OK).
-    - Confirmation de la suppression: ```Video deleted```
-- Pour le code ```404``` (NOT_FOUND)
-    - La video demandée n'existe pas: ```Video not found```
-- Pour le code ```403``` (FORBIDDEN)
-    - La vidéo n'est actuellement pas disponible: ```Video is currently being downloaded by other users```
-- Pour le code ```500``` (ERROR)
-    - Si le nombre d'arguments n'est pas valide:
+- For code ```200``` (OK).
+    - Confirmation of deletion: ```Video deleted```
+- For code ```404``` (NOT_FOUND)
+    - The requested video does not exist: ```Video not found```
+- For code ```403``` (FORBIDDEN)
+    - The video is currently unavailable: ```Video is currently being downloaded by other users```
+- For code ```500``` (ERROR)
+    - If the number of arguments is invalid:
       ```Server error : The delete command expects exactly one argument (DELETE <videoChoice>)```
 
 #### Exception
 
-En cas d'exception lors de la suppression, le serveur retournera un code ```500``` (ERROR) suivit du message ```Server 
-error : <Exception_message>```  
+In the event of an exception during deletion, the server will return a code ```500``` (ERROR) followed by the message 
+```Server error: <Exception_message>```.  
 
-### Déconnexion du serveur
+### Disconnecting from the server
 
-Le client se décocnnecte du serveur.
+The client disconnects from the server.
 
 #### Message
 
 ```QUIT```
 
-#### Réponse
+#### Response
 
-- Pour le code ```200``` (OK).
-    - Confirmation de la déconnexion: ```See you soon :)```
+- For code ```200``` (OK).
+    - Confirmation of disconnection: ```See you soon :)```
 
-_Le serveur renverra toujours une confirmation de déconnexion, même si l'utilisateur n'était pas connecté._
-
+_The server will always send a disconnection confirmation, even if the user was not logged in._
 
 ## Examples
 
