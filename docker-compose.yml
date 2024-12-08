@@ -5,7 +5,6 @@ services:
     ports:
       - "1986:1986"
     volumes:
-      - ./videos:/app/videos
       - ./server_data:/app/server_data
     networks:
       - streaming-net
