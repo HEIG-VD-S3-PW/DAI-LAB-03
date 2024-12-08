@@ -1,6 +1,6 @@
 services:
   server:
-    image: ghcr.io/HEIG-VD-S3-PW/dai-lab-03:latest
+    image: ghcr.io/heig-vd-s3-pw/dai-lab-03:latest
     container_name: streaming-server
     ports:
       - "1986:1986"
@@ -12,7 +12,7 @@ services:
     stdin_open: true
     tty: true
   client:
-    image: ghcr.io/HEIG-VD-S3-PW/dai-lab-03:latest
+    image: ghcr.io/heig-vd-s3-pw/dai-lab-03:latest
     container_name: streaming-client
     volumes:
       - ./client_data:/app/client_data
@@ -20,7 +20,7 @@ services:
       - server
     networks:
       - streaming-net
-    command: Client
+    command: Client -H streaming-server
     stdin_open: true
     tty: true
 
