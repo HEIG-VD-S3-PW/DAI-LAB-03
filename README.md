@@ -1,8 +1,8 @@
-# Streaming Video Manager
+# Video Manager Application
 
 ### Version 1.0.0
 
-A command-line utility to select videos on a remote server so you can then download them. The application allows you to easily connect yourself remotely to the server, help you choose a video and then plays it for you with your system-default video player.
+A command-line utility to select videos on a remote server so you can then download them. The application allows you to easily connect yourself remotely to the server, upload, download, delete, and list videos. 
 
 ## Table of Contents
 - [Features](#features)
@@ -91,7 +91,7 @@ java -jar target/DAI-LAB-03-1.0-SNAPSHOT.jar --help
 Output:
 
 ```vbnet
-======= Amar Streaming Platform =======
+======= Ammar Video Platform =======
 
 Download, upload and remove videos from/to a remote server
 
@@ -105,7 +105,7 @@ Options:
   -V, --version   Print version information and exit.
 
 Commands:
-  Client  Start the client to connect to the streaming server.
+  Client  Start the client to connect to the video manager server.
   Server  Start the server to accept remote connections
 
 Credits: Tristan Baud, Arno Tribolet and Mathieu Emery
@@ -146,7 +146,6 @@ java -jar target/DAI-LAB-03-1.0-SNAPSHOT.jar Server --help
 ```vbnet
 === Server Command ===
 
-
 Usage: DAI-LAB-03-1.0-SNAPSHOT.jar Server [-p=<port>]
 
 Description:
@@ -186,14 +185,14 @@ java -jar target/DAI-LAB-03-1.0-SNAPSHOT.jar Client -H localhost
 Output:
 
 ```arduino
-Welcome to the Amar Streaming Platform !
+> CONNECT
 Enter your pseudo:
 ```
 
 The client will then have to enter his pseudo (Will ask you to re-enter it if you don't):
 
 ```arduino
-Welcome to the Amar Streaming Platform !
+> CONNECT
 Enter your pseudo: 
 Enter your pseudo: toto
 Enter your email:
@@ -222,8 +221,7 @@ Example with the command LIST:
 1) 3 Minute Timer - Displays a timer from 3 minutes to 0
 2) Google Office tour - Visit of Google's building
 3) L'entretien - Choss - Vidéo de Choss sur un entretien
-4) Le Clown - Choss - Vidéo de Choss sur un clown
-5) Why is Switzerland home to so many billionaires - Documentary on Switzerland's billionaires
+4) Why is Switzerland home to so many billionaires - Documentary on Switzerland's billionaires
 >
 ```
 
@@ -338,7 +336,7 @@ public CommandRegistry(BufferedReader in, BufferedWriter out) {
 
 Now your command is available to use in the application.
 
-__Moreover, if you choose to contribute to the project by adding a new command, you have to create diagrams to explain the new command, how it works, and the interactions between the client and the server.__
+__Moreover, if you choose to contribute to the project by adding a new command, a diagram of the correct and wrong use of the command is required.__
 
 ---
 
